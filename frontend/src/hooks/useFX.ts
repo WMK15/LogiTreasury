@@ -9,7 +9,9 @@ import { fxExecutionEngineAbi } from '@/abi/FXExecutionEngine';
 import { parseUnits } from 'viem';
 import { SwapDirection, type FXQuote, type FXExposure, type RateSnapshot } from '@/types/treasury';
 
-const FX_ENGINE_ADDRESS = process.env.NEXT_PUBLIC_FX_ENGINE_ADDRESS as `0x${string}`;
+import { CONTRACTS } from '@/lib/config';
+
+const FX_ENGINE_ADDRESS = CONTRACTS.fxEngine;
 
 // ============ Read Hooks ============
 

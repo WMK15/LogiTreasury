@@ -55,5 +55,17 @@ export {
   useAllChainConfigs,
 } from './useSettlement';
 
+// CPN Hooks
+export {
+  useUserBankAccounts,
+  useBankAccount,
+  useUserDeposits,
+  useUserWithdrawals,
+  useDailyLimitsStatus,
+  useAddBankAccount,
+  useInitiateDeposit,
+  useRequestWithdrawal,
+} from './useCPN';
+
 // Legacy hooks
 export * from './useContracts';

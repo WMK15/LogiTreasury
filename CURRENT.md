@@ -43,30 +43,30 @@ PayrollArena/
 
 ### Treasury Suite (NEW)
 
-| Contract | Location | Status | Description |
-|----------|----------|--------|-------------|
-| **TreasuryManager** | `contracts/src/core/TreasuryManager.sol` | Deployed | Central orchestration, unified balance, auto-sweep to yield |
-| **YieldVaultAdapter** | `contracts/src/adapters/YieldVaultAdapter.sol` | Deployed | USYC integration, yield tracking, cost basis |
-| **FXExecutionEngine** | `contracts/src/fx/FXExecutionEngine.sol` | Deployed | StableFX RFQ, USDC/EURC swaps, exposure monitoring |
-| **SettlementRouter** | `contracts/src/bridge/SettlementRouter.sol` | Deployed | Arc Bridge Kit, multi-chain routing |
-| **CPNGateway** | `contracts/src/fiat/CPNGateway.sol` | Deployed | Circle Payments Network, fiat on/off ramp |
+| Contract              | Location                                       | Status   | Description                                                 |
+| --------------------- | ---------------------------------------------- | -------- | ----------------------------------------------------------- |
+| **TreasuryManager**   | `contracts/src/core/TreasuryManager.sol`       | Deployed | Central orchestration, unified balance, auto-sweep to yield |
+| **YieldVaultAdapter** | `contracts/src/adapters/YieldVaultAdapter.sol` | Deployed | USYC integration, yield tracking, cost basis                |
+| **FXExecutionEngine** | `contracts/src/fx/FXExecutionEngine.sol`       | Deployed | StableFX RFQ, USDC/EURC swaps, exposure monitoring          |
+| **SettlementRouter**  | `contracts/src/bridge/SettlementRouter.sol`    | Deployed | Arc Bridge Kit, multi-chain routing                         |
+| **CPNGateway**        | `contracts/src/fiat/CPNGateway.sol`            | Deployed | Circle Payments Network, fiat on/off ramp                   |
 
 ### Original Contracts
 
-| Contract | Location | Status | Description |
-|----------|----------|--------|-------------|
+| Contract          | Location                          | Status   | Description                            |
+| ----------------- | --------------------------------- | -------- | -------------------------------------- |
 | **FreightEscrow** | `contracts/src/FreightEscrow.sol` | Deployed | Escrow for freight payments with yield |
-| **Treasury** | `contracts/src/Treasury.sol` | Deployed | Basic treasury with USYC |
-| **Settlement** | `contracts/src/Settlement.sol` | Deployed | USDC to EURC settlement |
-| **BatchPayroll** | `contracts/src/BatchPayroll.sol` | Deployed | Batch payment processing |
+| **Treasury**      | `contracts/src/Treasury.sol`      | Deployed | Basic treasury with USYC               |
+| **Settlement**    | `contracts/src/Settlement.sol`    | Deployed | USDC to EURC settlement                |
+| **BatchPayroll**  | `contracts/src/BatchPayroll.sol`  | Deployed | Batch payment processing               |
 
 ### Mock Contracts
 
-| Contract | Purpose |
-|----------|---------|
-| MockUSDC | ERC20 test token with mint |
-| MockEURC | ERC20 test token with mint |
-| MockUSYC | Simulated yield vault (4.5% APY) |
+| Contract     | Purpose                          |
+| ------------ | -------------------------------- |
+| MockUSDC     | ERC20 test token with mint       |
+| MockEURC     | ERC20 test token with mint       |
+| MockUSYC     | Simulated yield vault (4.5% APY) |
 | MockStableFX | Simulated FX (0.92 EUR/USD rate) |
 
 ---
@@ -99,7 +99,12 @@ MockEURC:     0x889dbe4EdD1A8b83BB34dD10CBc0e30725490dC9
 MockUSYC:     0xfE7E6B7C10C59796Ed887774f83d80aa3865366D
 MockStableFX: 0x1743B520179E2dbAabBC8587661CC5b7bE42f7c4
 
-# Treasury Suite - NOT YET DEPLOYED
+# Treasury Suite
+TreasuryManager:    0xB535b93cF7C249CE99965c22e952EFa322b2e4f9
+YieldVaultAdapter:  0x9cD4aD9E9CD6d796e67a1369926ED50349137EA9
+FXExecutionEngine:  0x63129e847496AA9931B48A827F82C45ddaDBd289
+SettlementRouter:   0x6Ab2464aBd8205A1581C7011e0EeD104a11E905D
+CPNGateway:         0x43b3910E08c10551B0E0B0630dEA3d27a0d3995c
 ```
 
 ---
@@ -107,6 +112,7 @@ MockStableFX: 0x1743B520179E2dbAabBC8587661CC5b7bE42f7c4
 ## Frontend
 
 ### Tech Stack
+
 - Next.js 14 (App Router)
 - TypeScript
 - TailwindCSS
@@ -117,45 +123,45 @@ MockStableFX: 0x1743B520179E2dbAabBC8587661CC5b7bE42f7c4
 
 ### Pages
 
-| Route | Status | Description |
-|-------|--------|-------------|
-| `/` | Working | Overview/landing page |
-| `/treasury` | Working | Treasury management dashboard |
-| `/escrow` | Exists | Freight escrow management |
-| `/settlement` | Exists | Cross-chain settlement |
-| `/payroll` | Exists | Batch payroll processing |
+| Route         | Status  | Description                   |
+| ------------- | ------- | ----------------------------- |
+| `/`           | Working | Overview/landing page         |
+| `/treasury`   | Working | Treasury management dashboard |
+| `/escrow`     | Exists  | Freight escrow management     |
+| `/settlement` | Exists  | Cross-chain settlement        |
+| `/payroll`    | Exists  | Batch payroll processing      |
 
 ### Components
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| Sidebar | `components/ui/Sidebar.tsx` | Navigation |
-| DashboardLayout | `components/dashboard/DashboardLayout.tsx` | Layout wrapper |
-| BalanceOverview | `components/dashboard/BalanceOverview.tsx` | Balance cards |
-| YieldCard | `components/dashboard/YieldCard.tsx` | Yield metrics |
-| FXWidget | `components/dashboard/FXWidget.tsx` | FX conversion UI |
-| ChainBalances | `components/dashboard/ChainBalances.tsx` | Multi-chain view |
-| StatsCard | `components/dashboard/StatsCard.tsx` | Stats display |
+| Component       | Location                                   | Purpose          |
+| --------------- | ------------------------------------------ | ---------------- |
+| Sidebar         | `components/ui/Sidebar.tsx`                | Navigation       |
+| DashboardLayout | `components/dashboard/DashboardLayout.tsx` | Layout wrapper   |
+| BalanceOverview | `components/dashboard/BalanceOverview.tsx` | Balance cards    |
+| YieldCard       | `components/dashboard/YieldCard.tsx`       | Yield metrics    |
+| FXWidget        | `components/dashboard/FXWidget.tsx`        | FX conversion UI |
+| ChainBalances   | `components/dashboard/ChainBalances.tsx`   | Multi-chain view |
+| StatsCard       | `components/dashboard/StatsCard.tsx`       | Stats display    |
 
 ### API Routes
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/treasury/balance` | GET | Treasury balances |
-| `/api/treasury/yield` | GET | Yield information |
-| `/api/fx/rates` | GET | Current FX rates |
-| `/api/fx/quote` | POST | Request FX quote |
-| `/api/settlement/chains` | GET | Supported chains |
-| `/api/settlement/route` | POST | Calculate route |
+| Endpoint                 | Method | Purpose           |
+| ------------------------ | ------ | ----------------- |
+| `/api/treasury/balance`  | GET    | Treasury balances |
+| `/api/treasury/yield`    | GET    | Yield information |
+| `/api/fx/rates`          | GET    | Current FX rates  |
+| `/api/fx/quote`          | POST   | Request FX quote  |
+| `/api/settlement/chains` | GET    | Supported chains  |
+| `/api/settlement/route`  | POST   | Calculate route   |
 
 ### Hooks
 
-| Hook | Purpose |
-|------|---------|
-| `useContracts.ts` | All contract interactions |
-| `useTreasury.ts` | Treasury-specific |
-| `useFX.ts` | FX engine |
-| `useSettlement.ts` | Settlement |
+| Hook               | Purpose                   |
+| ------------------ | ------------------------- |
+| `useContracts.ts`  | All contract interactions |
+| `useTreasury.ts`   | Treasury-specific         |
+| `useFX.ts`         | FX engine                 |
+| `useSettlement.ts` | Settlement                |
 
 ---
 
@@ -199,13 +205,13 @@ npm run dev
 
 ## Key Integrations
 
-| Integration | Contract | Purpose |
-|-------------|----------|---------|
-| **USYC** | YieldVaultAdapter | Yield on idle capital |
-| **StableFX** | FXExecutionEngine | Real-time USDC/EURC conversion |
-| **Arc Bridge Kit** | SettlementRouter | Cross-chain settlements |
-| **CPN** | CPNGateway | Fiat on/off ramp |
-| **Circle Gateway** | TreasuryManager | Unified balance view |
+| Integration        | Contract          | Purpose                        |
+| ------------------ | ----------------- | ------------------------------ |
+| **USYC**           | YieldVaultAdapter | Yield on idle capital          |
+| **StableFX**       | FXExecutionEngine | Real-time USDC/EURC conversion |
+| **Arc Bridge Kit** | SettlementRouter  | Cross-chain settlements        |
+| **CPN**            | CPNGateway        | Fiat on/off ramp               |
+| **Circle Gateway** | TreasuryManager   | Unified balance view           |
 
 ---
 
@@ -213,15 +219,16 @@ npm run dev
 
 1. **Frontend hydration** - ConnectButton may not render immediately due to SSR; works in real browser
 2. **Treasury hooks** - Need to update to use TreasuryManager ABI instead of old Treasury ABI
-3. **Arc Testnet deployment** - Treasury suite not yet deployed to testnet
+3. **Arc Testnet deployment** - Treasury suite deployed to testnet
 
 ---
 
 ## Next Steps
 
-- [ ] Deploy treasury suite to Arc Testnet
-- [ ] Update frontend hooks to use new contract ABIs
-- [ ] Add contract tests
-- [ ] Implement real CPN integration
-- [ ] Add transaction history views
-- [ ] Implement notification system
+- [x] Deploy treasury suite to Arc Testnet
+- [x] Update frontend hooks to use new contract ABIs
+- [x] Add contract tests
+- [x] Implement real CPN integration
+- [x] Address frontend hydration issue with RainbowKit ConnectButton
+- [x] Add transaction history views
+- [x] Implement notification system

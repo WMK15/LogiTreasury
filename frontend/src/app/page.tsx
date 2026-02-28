@@ -2,29 +2,33 @@
 
 import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ClientOnly } from "@/components/ui/ClientOnly";
 import { formatUSDC, formatPercent } from "@/lib/config";
 import {
   useUSDCBalance,
   useEURCBalance,
-  useTreasuryBalance,
-  useTreasuryYield,
-  useTreasuryAPY,
   useEscrowCount,
   useBatchCount,
-  useCurrentFXRate,
 } from "@/hooks/useContracts";
+import { useTreasuryDashboard } from "@/hooks/useTreasury";
+import { useCurrentRates } from "@/hooks/useFX";
+import { RateSnapshot } from "@/types/treasury";
+import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
 
 export default function Overview() {
   const { address, isConnected } = useAccount();
 
   const { data: usdcBalance } = useUSDCBalance(address);
   const { data: eurcBalance } = useEURCBalance(address);
-  const { data: treasuryBalance } = useTreasuryBalance();
-  const { data: treasuryYield } = useTreasuryYield();
-  const { data: apy } = useTreasuryAPY();
+  const { balanceSnapshot, yieldMetrics } = useTreasuryDashboard();
   const { data: escrowCount } = useEscrowCount();
   const { data: batchCount } = useBatchCount();
-  const { data: fxRate } = useCurrentFXRate();
+  const { data: rates } = useCurrentRates();
+
+  const treasuryBalance = balanceSnapshot?.totalValue;
+  const treasuryYield = yieldMetrics?.unrealizedYield;
+  const apy = yieldMetrics?.currentAPY;
+  const fxRate = (rates as RateSnapshot)?.usdcToEurcRate;
 
   if (!isConnected) {
     return (
@@ -33,7 +37,9 @@ export default function Overview() {
         <p className="text-sm text-neutral-500 mb-6">
           European logistics treasury and settlement platform
         </p>
-        <ConnectButton />
+        <ClientOnly>
+          <ConnectButton />
+        </ClientOnly>
       </div>
     );
   }
@@ -44,82 +50,80 @@ export default function Overview() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-sm font-medium text-neutral-100">Overview</h1>
         <p className="text-xs text-neutral-500">
-          {new Date().toLocaleDateString("en-GB", { 
-            day: "numeric", 
-            month: "short", 
-            year: "numeric" 
+          {new Date().toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
           })}
         </p>
       </div>
 
       {/* Primary KPIs */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <KPI 
-          label="Treasury Balance" 
-          value={treasuryBalance ? formatUSDC(treasuryBalance) : "0.00"} 
+        <KPI
+          label="Treasury Balance"
+          value={treasuryBalance ? formatUSDC(treasuryBalance) : "0.00"}
           suffix="USDC"
           highlight
         />
-        <KPI 
-          label="Yield Accrued" 
-          value={treasuryYield ? formatUSDC(treasuryYield) : "0.00"} 
+        <KPI
+          label="Yield Accrued"
+          value={treasuryYield ? formatUSDC(treasuryYield) : "0.00"}
           suffix="USDC"
         />
-        <KPI 
-          label="Current APY" 
+        <KPI
+          label="Current APY"
           value={apy ? formatPercent(Number(apy)) : "—"}
         />
-        <KPI 
-          label="EUR/USD Rate" 
+        <KPI
+          label="EUR/USD Rate"
           value={fxRate ? (Number(fxRate) / 1e18).toFixed(4) : "—"}
         />
       </div>
 
       {/* Secondary KPIs */}
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <KPI 
-          label="Wallet USDC" 
-          value={usdcBalance ? formatUSDC(usdcBalance) : "0.00"} 
+        <KPI
+          label="Wallet USDC"
+          value={usdcBalance ? formatUSDC(usdcBalance) : "0.00"}
         />
-        <KPI 
-          label="Wallet EURC" 
-          value={eurcBalance ? formatUSDC(eurcBalance) : "0.00"} 
+        <KPI
+          label="Wallet EURC"
+          value={eurcBalance ? formatUSDC(eurcBalance) : "0.00"}
         />
-        <KPI 
-          label="Active Escrows" 
-          value={escrowCount?.toString() || "0"} 
-        />
-        <KPI 
-          label="Payroll Batches" 
-          value={batchCount?.toString() || "0"} 
-        />
+        <KPI label="Active Escrows" value={escrowCount?.toString() || "0"} />
+        <KPI label="Payroll Batches" value={batchCount?.toString() || "0"} />
       </div>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-4">
-        <QuickAction 
+        <QuickAction
           title="Freight Escrow"
           description="Create escrow for high-value shipments with yield accrual"
           href="/escrow"
         />
-        <QuickAction 
+        <QuickAction
           title="Euro Settlement"
           description="Convert USDC to EURC for European payments"
           href="/settlement"
         />
       </div>
+
+      <div className="mt-8">
+        <TransactionHistory />
+      </div>
     </div>
   );
 }
 
-function KPI({ 
-  label, 
-  value, 
+function KPI({
+  label,
+  value,
   suffix,
-  highlight 
-}: { 
-  label: string; 
-  value: string; 
+  highlight,
+}: {
+  label: string;
+  value: string;
   suffix?: string;
   highlight?: boolean;
 }) {
@@ -128,7 +132,9 @@ function KPI({
       <p className="kpi-label mb-1">{label}</p>
       <p className={`kpi-value ${highlight ? "text-neutral-50" : ""}`}>
         {value}
-        {suffix && <span className="text-neutral-500 text-sm ml-1">{suffix}</span>}
+        {suffix && (
+          <span className="text-neutral-500 text-sm ml-1">{suffix}</span>
+        )}
       </p>
     </div>
   );
@@ -144,10 +150,7 @@ function QuickAction({
   href: string;
 }) {
   return (
-    <a 
-      href={href}
-      className="card row-hover block"
-    >
+    <a href={href} className="card row-hover block">
       <p className="text-sm font-medium text-neutral-200 mb-1">{title}</p>
       <p className="text-xs text-neutral-500">{description}</p>
     </a>

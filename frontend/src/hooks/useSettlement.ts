@@ -9,7 +9,9 @@ import { settlementRouterAbi } from '@/abi/SettlementRouter';
 import { parseUnits } from 'viem';
 import type { Settlement, BatchSettlement, ChainConfig, RouteQuote } from '@/types/treasury';
 
-const ROUTER_ADDRESS = process.env.NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS as `0x${string}`;
+import { CONTRACTS } from '@/lib/config';
+
+const ROUTER_ADDRESS = CONTRACTS.settlementRouter;
 
 // ============ Read Hooks ============
 

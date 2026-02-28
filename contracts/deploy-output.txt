@@ -1,0 +1,61 @@
+============================================================
+ArcLogistics Treasury Suite Deployment
+============================================================
+Network: arcTestnet
+Chain ID: 5042002
+
+Deployer: 0xCfeC022199D0Cb41186B47E508a2D2d54923E7dA
+Balance: 19.534089156176931862 (native)
+
+Using existing deployed mock contracts...
+
+Deploying Treasury Suite...
+
+1. Deploying YieldVaultAdapter...
+   YieldVaultAdapter: 0x9cD4aD9E9CD6d796e67a1369926ED50349137EA9
+2. Deploying TreasuryManager...
+   TreasuryManager: 0xB535b93cF7C249CE99965c22e952EFa322b2e4f9
+3. Deploying FXExecutionEngine...
+   FXExecutionEngine: 0x63129e847496AA9931B48A827F82C45ddaDBd289
+4. Deploying SettlementRouter...
+   SettlementRouter: 0x6Ab2464aBd8205A1581C7011e0EeD104a11E905D
+5. Deploying CPNGateway...
+   CPNGateway: 0x43b3910E08c10551B0E0B0630dEA3d27a0d3995c
+
+Configuring contracts...
+  YieldVaultAdapter: TreasuryManager configured
+  FXExecutionEngine: TreasuryManager set as operator
+  SettlementRouter: TreasuryManager set as operator
+  CPNGateway: TreasuryManager set as operator
+  TreasuryManager: Deployer set as operator
+
+============================================================
+DEPLOYMENT COMPLETE
+============================================================
+
+Treasury Suite Addresses:
+  TreasuryManager:    0xB535b93cF7C249CE99965c22e952EFa322b2e4f9
+  YieldVaultAdapter:  0x9cD4aD9E9CD6d796e67a1369926ED50349137EA9
+  FXExecutionEngine:  0x63129e847496AA9931B48A827F82C45ddaDBd289
+  SettlementRouter:   0x6Ab2464aBd8205A1581C7011e0EeD104a11E905D
+  CPNGateway:         0x43b3910E08c10551B0E0B0630dEA3d27a0d3995c
+
+Mock Token Addresses:
+  USDC:     0x5D2EF4689bd78E78aC6f25cBAb601B74a16597cB
+  EURC:     0x889dbe4EdD1A8b83BB34dD10CBc0e30725490dC9
+  USYC:     0xfE7E6B7C10C59796Ed887774f83d80aa3865366D
+  StableFX: 0x1743B520179E2dbAabBC8587661CC5b7bE42f7c4
+
+Add to frontend/.env.local:
+
+NEXT_PUBLIC_USDC_ADDRESS=0x5D2EF4689bd78E78aC6f25cBAb601B74a16597cB
+NEXT_PUBLIC_EURC_ADDRESS=0x889dbe4EdD1A8b83BB34dD10CBc0e30725490dC9
+NEXT_PUBLIC_USYC_ADDRESS=0xfE7E6B7C10C59796Ed887774f83d80aa3865366D
+NEXT_PUBLIC_STABLEFX_ADDRESS=0x1743B520179E2dbAabBC8587661CC5b7bE42f7c4
+NEXT_PUBLIC_TREASURY_MANAGER_ADDRESS=0xB535b93cF7C249CE99965c22e952EFa322b2e4f9
+NEXT_PUBLIC_YIELD_VAULT_ADAPTER_ADDRESS=0x9cD4aD9E9CD6d796e67a1369926ED50349137EA9
+NEXT_PUBLIC_FX_ENGINE_ADDRESS=0x63129e847496AA9931B48A827F82C45ddaDBd289
+NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS=0x6Ab2464aBd8205A1581C7011e0EeD104a11E905D
+NEXT_PUBLIC_CPN_GATEWAY_ADDRESS=0x43b3910E08c10551B0E0B0630dEA3d27a0d3995c
+
+============================================================

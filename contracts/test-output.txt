@@ -1,0 +1,43 @@
+
+
+  TreasuryManager Suite
+    Deployment
+      ✔ Should set the right owner and default config
+    Deposits
+      1) Should allow user to deposit USDC
+      ✔ Should auto-sweep if deposit exceeds buffer and threshold
+    Withdrawals
+      ✔ Should allow operator to execute small withdrawal
+      ✔ Should require admin approval for large withdrawal
+      ✔ Should block non-operator from withdrawing
+    Yield Harvesting
+      2) Should accumulate yield and allow harvesting
+
+
+  5 passing (722ms)
+  2 failing
+
+  1) TreasuryManager Suite
+       Deposits
+         Should allow user to deposit USDC:
+
+      AssertionError: Error in "Deposit" event: Error in the 4th argument assertion: expected 1772302282 to equal 1772302283.
+      + expected - actual
+
+      -1772302282
+      +1772302283
+      
+      at async Context.<anonymous> (test\TreasuryManager.test.ts:86:7)
+
+  2) TreasuryManager Suite
+       Yield Harvesting
+         Should accumulate yield and allow harvesting:
+
+      AssertionError: expected 0 to be above 0.
+      + expected - actual
+
+
+      at Context.<anonymous> (test\TreasuryManager.test.ts:178:50)
+
+
+

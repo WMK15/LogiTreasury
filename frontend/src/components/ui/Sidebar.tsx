@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ClientOnly } from "@/components/ui/ClientOnly";
 
 const navItems = [
   { href: "/", label: "Overview", icon: "◉" },
   { href: "/escrow", label: "Freight Escrow", icon: "◈" },
   { href: "/treasury", label: "Treasury", icon: "◇" },
+  { href: "/fiat", label: "Fiat (CPN)", icon: "€" },
   { href: "/settlement", label: "Settlement", icon: "⬡" },
   { href: "/payroll", label: "Payroll", icon: "▤" },
 ];
@@ -47,11 +49,13 @@ export function Sidebar() {
 
       {/* Wallet */}
       <div className="p-4 border-t border-neutral-800">
-        <ConnectButton 
-          showBalance={false}
-          chainStatus="icon"
-          accountStatus="address"
-        />
+        <ClientOnly>
+          <ConnectButton
+            showBalance={false}
+            chainStatus="icon"
+            accountStatus="address"
+          />
+        </ClientOnly>
       </div>
     </aside>
   );

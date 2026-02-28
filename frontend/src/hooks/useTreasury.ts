@@ -10,8 +10,10 @@ import { yieldVaultAdapterAbi } from '@/abi/YieldVaultAdapter';
 import { parseUnits } from 'viem';
 import type { BalanceSnapshot, YieldMetrics, YieldConfig } from '@/types/treasury';
 
-const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_MANAGER_ADDRESS as `0x${string}`;
-const YIELD_ADAPTER_ADDRESS = process.env.NEXT_PUBLIC_YIELD_ADAPTER_ADDRESS as `0x${string}`;
+import { CONTRACTS } from '@/lib/config';
+
+const TREASURY_ADDRESS = CONTRACTS.treasuryManager;
+const YIELD_ADAPTER_ADDRESS = CONTRACTS.yieldVaultAdapter;
 
 // ============ Read Hooks ============
 

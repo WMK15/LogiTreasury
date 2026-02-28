@@ -1,0 +1,277 @@
+
+> @payroll-arena/frontend@1.0.0 build
+> next build
+
+   ▲ Next.js 14.1.0
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+Failed to compile.
+
+static/chunks/app/layout-9dea97389f065640.js from Terser
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+Error: 
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+
+static/chunks/app/escrow/page-8a8bb87230692a8d.js from Terser
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+Error: 
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+
+static/chunks/app/settlement/page-532bbce2badffff1.js from Terser
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+Error: 
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+
+static/chunks/app/fiat/page-d14bacc558e9f5c1.js from Terser
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+Error: 
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+
+static/chunks/app/payroll/page-85fc17de2e747a31.js from Terser
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+Error: 
+  x Expression expected
+   ,-[4:1]
+ 4 | /***/ (function(module) {
+ 5 | 
+ 6 | "use strict";
+ 7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+   :                 ^
+ 8 | 
+ 9 | module.exports = @react-native-async-storage/async-storage;
+   `----
+
+  x Expression expected
+    ,-[6:1]
+  6 | "use strict";
+  7 | if(typeof @react-native-async-storage/async-storage === 'undefined') { var e = new Error("Cannot find module '@react-native-async-storage/async-storage'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+  8 | 
+  9 | module.exports = @react-native-async-storage/async-storage;
+    :                        ^
+ 10 | 
+ 11 | /***/ }),
+    `----
+
+Caused by:
+    0: failed to parse input file
+    1: Syntax Error
+
+
+> Build failed because of webpack errors
