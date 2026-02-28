@@ -92,9 +92,9 @@ export default function AnalyticsPage() {
   const { data: fxExposure } = useFXExposure();
 
   // Calculate allocations
-  const usdcValue = usdcBalance ? Number(usdcBalance) / 1e6 : 128_500;
-  const eurcValue = eurcBalance ? Number(eurcBalance) / 1e6 : 42_300;
-  const usycValue = usycBalance ? Number(usycBalance as bigint) / 1e6 : 85_000;
+  const usdcValue = usdcBalance ? Number(usdcBalance) / 1e6 : 0;
+  const eurcValue = eurcBalance ? Number(eurcBalance) / 1e6 : 0;
+  const usycValue = usycBalance ? Number(usycBalance as bigint) / 1e6 : 0;
   const totalAssets = usdcValue + eurcValue + usycValue || 1;
   const usdcPct = ((usdcValue / totalAssets) * 100).toFixed(1);
   const eurcPct = ((eurcValue / totalAssets) * 100).toFixed(1);

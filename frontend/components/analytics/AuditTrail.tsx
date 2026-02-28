@@ -8,18 +8,18 @@ import {
 } from "@/lib/supabase";
 import type { AuditTrailEntry, Transaction } from "@/lib/supabase";
 
-// ============ Mock Data ============
+// ============ Mock Data (testnet-realistic values) ============
 
 const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
   {
     id: "audit-1",
     tx_id: "tx-1",
     action_type: "Cross-border Levy",
-    tax_basis_usd: 25000,
+    tax_basis_usd: 25,
     tax_rate_applied: 0.005,
-    total_tax_withheld: 125,
+    total_tax_withheld: 0.13,
     ai_reasoning_summary:
-      "EU MiCA cross-border levy applied to USDC→EURC conversion. Rate: 0.5% of $25,000 transaction value. Compliant with European regulatory framework.",
+      "EU MiCA cross-border levy applied to USDC→EURC conversion. Rate: 0.5% of $25.00 transaction value. Compliant with European regulatory framework.",
     compliance_status: "COMPLIANT",
     created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
     transaction: {
@@ -28,8 +28,8 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
       type: "FX_SWAP",
       from_currency: "USDC",
       to_currency: "EURC",
-      amount: 25000,
-      fiat_value_usd: 25000,
+      amount: 25,
+      fiat_value_usd: 25,
       tx_hash:
         "0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890",
       status: "COMPLETED",
@@ -41,11 +41,11 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
     id: "audit-2",
     tx_id: "tx-2",
     action_type: "Yield Withholding",
-    tax_basis_usd: 200, // yield gain on $50k sweep
+    tax_basis_usd: 0.2,
     tax_rate_applied: 0.2,
-    total_tax_withheld: 40,
+    total_tax_withheld: 0.04,
     ai_reasoning_summary:
-      "Projected withholding tax on USYC T-Bill yield. $200 monthly yield on $50,000 sweep subject to 20% institutional withholding rate.",
+      "Projected withholding tax on USYC T-Bill yield. $0.20 monthly yield on $50 sweep subject to 20% institutional withholding rate.",
     compliance_status: "COMPLIANT",
     created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
     transaction: {
@@ -54,8 +54,8 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
       type: "TREASURY_SWEEP",
       from_currency: "USDC",
       to_currency: "USYC",
-      amount: 50000,
-      fiat_value_usd: 50000,
+      amount: 50,
+      fiat_value_usd: 50,
       tx_hash:
         "0x2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890ab",
       status: "COMPLETED",
@@ -67,11 +67,11 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
     id: "audit-3",
     tx_id: "tx-3",
     action_type: "Settlement Fee",
-    tax_basis_usd: 15000,
+    tax_basis_usd: 15,
     tax_rate_applied: 0.001,
-    total_tax_withheld: 15,
+    total_tax_withheld: 0.015,
     ai_reasoning_summary:
-      "Cross-chain settlement processing fee for EURC→EUR conversion via Arc Bridge Kit. 0.1% fee on $15,000 settlement.",
+      "Cross-chain settlement processing fee for EURC→EUR conversion via Arc Bridge Kit. 0.1% fee on $15.00 settlement.",
     compliance_status: "COMPLIANT",
     created_at: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
     transaction: {
@@ -80,8 +80,8 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
       type: "SETTLEMENT",
       from_currency: "EURC",
       to_currency: "EUR",
-      amount: 15000,
-      fiat_value_usd: 16304.35,
+      amount: 15,
+      fiat_value_usd: 16.3,
       tx_hash:
         "0x3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
       status: "COMPLETED",
@@ -93,11 +93,11 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
     id: "audit-4",
     tx_id: "tx-4",
     action_type: "Cross-border Levy",
-    tax_basis_usd: 10869.57,
+    tax_basis_usd: 10.87,
     tax_rate_applied: 0.005,
-    total_tax_withheld: 54.35,
+    total_tax_withheld: 0.054,
     ai_reasoning_summary:
-      "EU MiCA cross-border levy applied to EURC→USDC reverse conversion. Rate: 0.5% of $10,869.57 equivalent value.",
+      "EU MiCA cross-border levy applied to EURC→USDC reverse conversion. Rate: 0.5% of $10.87 equivalent value.",
     compliance_status: "COMPLIANT",
     created_at: new Date(Date.now() - 72 * 3600 * 1000).toISOString(),
     transaction: {
@@ -106,8 +106,8 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
       type: "FX_SWAP",
       from_currency: "EURC",
       to_currency: "USDC",
-      amount: 10000,
-      fiat_value_usd: 10869.57,
+      amount: 10,
+      fiat_value_usd: 10.87,
       tx_hash:
         "0x4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcde1",
       status: "COMPLETED",
@@ -119,11 +119,11 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
     id: "audit-5",
     tx_id: "tx-5",
     action_type: "Yield Withholding",
-    tax_basis_usd: 140,
+    tax_basis_usd: 0.14,
     tax_rate_applied: 0.2,
-    total_tax_withheld: 28,
+    total_tax_withheld: 0.028,
     ai_reasoning_summary:
-      "Projected withholding tax on USYC T-Bill yield. $140 monthly yield on $35,000 sweep subject to 20% institutional withholding rate.",
+      "Projected withholding tax on USYC T-Bill yield. $0.14 monthly yield on $35 sweep subject to 20% institutional withholding rate.",
     compliance_status: "COMPLIANT",
     created_at: new Date(Date.now() - 96 * 3600 * 1000).toISOString(),
     transaction: {
@@ -132,8 +132,8 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
       type: "TREASURY_SWEEP",
       from_currency: "USDC",
       to_currency: "USYC",
-      amount: 35000,
-      fiat_value_usd: 35000,
+      amount: 35,
+      fiat_value_usd: 35,
       tx_hash:
         "0x5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
       status: "COMPLETED",
@@ -145,11 +145,11 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
     id: "audit-6",
     tx_id: "tx-6",
     action_type: "Cross-border Levy",
-    tax_basis_usd: 8500,
+    tax_basis_usd: 8.5,
     tax_rate_applied: 0.005,
-    total_tax_withheld: 42.5,
+    total_tax_withheld: 0.043,
     ai_reasoning_summary:
-      "EU MiCA cross-border levy applied to USDC→EURC conversion for EU payables. Rate: 0.5% of $8,500 value.",
+      "EU MiCA cross-border levy applied to USDC→EURC conversion for EU payables. Rate: 0.5% of $8.50 value.",
     compliance_status: "COMPLIANT",
     created_at: new Date(Date.now() - 120 * 3600 * 1000).toISOString(),
     transaction: {
@@ -158,8 +158,8 @@ const MOCK_AUDIT_DATA: (AuditTrailEntry & { transaction: Transaction })[] = [
       type: "FX_SWAP",
       from_currency: "USDC",
       to_currency: "EURC",
-      amount: 8500,
-      fiat_value_usd: 8500,
+      amount: 8.5,
+      fiat_value_usd: 8.5,
       tx_hash:
         "0x6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234",
       status: "COMPLETED",
@@ -257,13 +257,11 @@ export function AuditTrail() {
       try {
         if (isSupabaseConfigured()) {
           const data = await getAuditTrailWithTransactions();
-          // Filter entries that have transaction data
           const validEntries = data.filter(
             (e) => e.transaction,
           ) as (AuditTrailEntry & { transaction: Transaction })[];
           setEntries(validEntries.length > 0 ? validEntries : MOCK_AUDIT_DATA);
         } else {
-          // Use mock data when Supabase not configured
           setEntries(MOCK_AUDIT_DATA);
         }
       } catch {
@@ -273,12 +271,10 @@ export function AuditTrail() {
       }
     }
 
-    // Simulate loading delay for demo
     const timer = setTimeout(loadData, 800);
     return () => clearTimeout(timer);
   }, []);
 
-  // Compute totals
   const totalTaxWithheld = entries.reduce(
     (sum, e) => sum + e.total_tax_withheld,
     0,
@@ -290,7 +286,6 @@ export function AuditTrail() {
 
   return (
     <div className="card">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-sm font-medium text-neutral-100">Audit Trail</h2>
@@ -399,7 +394,6 @@ export function AuditTrail() {
                       )}
                     </td>
                   </tr>
-                  {/* Expanded AI Reasoning Row */}
                   {expandedRow === entry.id && (
                     <tr
                       key={`${entry.id}-detail`}

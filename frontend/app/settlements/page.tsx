@@ -7,8 +7,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatUSDC, CONTRACTS } from "@/lib/config";
 import {
   useUSDCBalance,
-  useShipperEscrows,
-  useCarrierEscrows,
   useApproveToken,
   useCreateEscrow,
   useEscrowCount,
@@ -23,7 +21,7 @@ const MOCK_SETTLEMENTS = [
     type: "FX Settlement",
     from: "USDC",
     to: "EURC",
-    amount: 25000,
+    amount: 25,
     rate: "0.9200",
     status: "Completed",
     date: new Date(Date.now() - 2 * 3600 * 1000).toLocaleDateString("en-GB"),
@@ -34,7 +32,7 @@ const MOCK_SETTLEMENTS = [
     type: "Escrow Release",
     from: "Escrow #3",
     to: "Carrier",
-    amount: 12500,
+    amount: 12.5,
     rate: "—",
     status: "Completed",
     date: new Date(Date.now() - 24 * 3600 * 1000).toLocaleDateString("en-GB"),
@@ -45,7 +43,7 @@ const MOCK_SETTLEMENTS = [
     type: "Cross-chain",
     from: "Arc",
     to: "Ethereum",
-    amount: 50000,
+    amount: 50,
     rate: "—",
     status: "Pending",
     date: new Date(Date.now() - 1 * 3600 * 1000).toLocaleDateString("en-GB"),
@@ -56,7 +54,7 @@ const MOCK_SETTLEMENTS = [
     type: "FX Settlement",
     from: "EURC",
     to: "USDC",
-    amount: 10000,
+    amount: 10,
     rate: "1.0870",
     status: "Completed",
     date: new Date(Date.now() - 72 * 3600 * 1000).toLocaleDateString("en-GB"),
@@ -67,7 +65,7 @@ const MOCK_SETTLEMENTS = [
     type: "Escrow Release",
     from: "Escrow #1",
     to: "Carrier",
-    amount: 8500,
+    amount: 8.5,
     rate: "—",
     status: "Completed",
     date: new Date(Date.now() - 96 * 3600 * 1000).toLocaleDateString("en-GB"),
@@ -87,14 +85,14 @@ export default function SettlementsPage() {
 
   const { data: usdcBalance, isLoading: balanceLoading } =
     useUSDCBalance(address);
-  const { data: shipperEscrows, isLoading: shipperLoading } =
-    useShipperEscrows(address);
-  const { data: carrierEscrows, isLoading: carrierLoading } =
-    useCarrierEscrows(address);
   const { data: escrowCount, isLoading: countLoading } = useEscrowCount();
 
-  const totalObligations =
-    (shipperEscrows?.length || 0) + (carrierEscrows?.length || 0);
+  // Shipper/Carrier escrows — no longer available via legacy FreightEscrow
+  const shipperEscrows: readonly bigint[] = [];
+  const carrierEscrows: readonly bigint[] = [];
+  const shipperLoading = false;
+  const carrierLoading = false;
+  const totalObligations = 0;
 
   if (!isConnected) {
     return (
@@ -444,7 +442,7 @@ function CreateEscrowForm({ onSuccess }: { onSuccess: () => void }) {
 
   const handleApprove = () => {
     if (form.amount) {
-      approve(CONTRACTS.freightEscrow, form.amount);
+      approve(CONTRACTS.settlementRouter, form.amount);
     }
   };
 

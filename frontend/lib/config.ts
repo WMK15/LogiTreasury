@@ -150,5 +150,5 @@ export const NETWORK_INFO = {
   mode: NETWORK_MODE,
   isLocal,
   chainId: activeChain.id,
-  chainName: activeChain.name,
+
 };

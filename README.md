@@ -1,89 +1,72 @@
-# ArcLogistics Treasury
+# LogiTreasury
 
-> **Unified Logistics Treasury & Payout Engine for European logistics companies**
+> **Enterprise Logistics Treasury Engine built on Arc Network**
 
-Enterprise-grade financial infrastructure built on Arc Network. Ensures no capital sits idle through automated yield optimization, instant FX conversion, cross-chain settlement, and seamless fiat integration.
+No capital sits idle. LogiTreasury automates yield optimization via USYC, instant FX conversion via StableFX, cross-chain settlement via Arc Bridge Kit, and fiat integration via Circle CPN — purpose-built for European logistics companies.
+
+Built for the **Encode x Arc Hackathon**.
+
+---
 
 ## Core Principle
 
 **No capital sits idle.** All funds are either:
-1. Earning yield via **USYC** (~4.5% APY)
-2. Converted optimally via **StableFX**
+
+1. Earning yield via **USYC** (~4.5% APY, Hashnote T-Bills)
+2. Converted optimally via **StableFX** (USDC ↔ EURC)
 3. Settled instantly across chains via **Arc Bridge Kit**
 4. Connected to traditional banking via **CPN**
 
 ---
 
-## Track Alignment
-
-### Track 1: Global Payouts & Treasury
-- Circle Wallets
-- Circle Gateway (unified balance)
-- Arc Bridge Kit (cross-chain)
-- CPN (fiat rails)
-
-### Track 2: USYC & StableFX
-- USYC (yield layer)
-- StableFX (FX layer)
-
----
-
 ## Features
 
-### Treasury Engine
-- Unified balance abstraction via Circle Gateway
-- Idle capital detection with auto-sweep to USYC
-- Multi-operator role-based access control
-- Liquidity availability tracking
+### 1. Dashboard — Total Liquidity
 
-### Freight Escrow Module
-- Shipment-linked escrow contracts
-- Funds automatically held in USYC while in transit
-- Conditional release upon delivery confirmation
-- Human-in-the-loop override for disputes
+- Unified balance view (bank liquid + on-chain breakdown)
+- Real-time wallet balances: Native USDC (gas), ERC20 USDC, EURC, USYC
+- **Smart Recommendations Toggle**: AI monitors idle cash and recommends USYC sweeps
+  - Converts to different assets (USYC / StableFX)
+  - Shows projected earnings
 
-### FX Execution Layer
-- StableFX RFQ flow integration
-- Real-time USDC ↔ EURC conversion
-- Atomic PvP settlement logic
-- FX exposure monitoring dashboard
+### 2. Analytics
 
-### Multi-Chain Settlement Router
-- Arc Bridge Kit integration
-- Destination chain routing logic
-- Mass payout capability (batch settlements)
-- Transaction status tracking
+- **FX Exposure Summary**: Currency risk analysis across operating currencies
+- **USYC Yield Over Time**: Actual yield earned from all treasury operations
+- **Audit Trail**: AI-generated tax compliance records for every conversion
+  - Cross-border levies (EU MiCA)
+  - Yield withholding calculations
+  - Settlement fees
 
-### Fiat Integration Layer
-- CPN funding flow (bank → USDC)
-- Fiat withdrawal flow (USDC → bank)
-- Bank account management
-- Treasury reconciliation
+### 3. Settlements & Escrows
+
+- Payment obligations with GPS/signature verification
+- Locked funds in yield-bearing escrow
+- Release history with Arc Explorer links
 
 ---
 
 ## Tech Stack
 
-### Smart Contracts
-- **Solidity 0.8.20**
-- **Hardhat** for development
-- Modular architecture:
-  - `TreasuryManager.sol` - Central treasury orchestration
-  - `YieldVaultAdapter.sol` - USYC integration
-  - `FXExecutionEngine.sol` - StableFX RFQ
-  - `SettlementRouter.sol` - Arc Bridge Kit
-  - `CPNGateway.sol` - Fiat integration
-  - `FreightEscrow.sol` - Shipment escrows
+### Smart Contracts (Treasury Suite)
+
+- **Solidity 0.8.20** / **Hardhat**
+- `TreasuryManager.sol` — Central treasury orchestration
+- `YieldVaultAdapter.sol` — USYC integration
+- `FXExecutionEngine.sol` — StableFX RFQ
+- `SettlementRouter.sol` — Arc Bridge Kit
+- `CPNGateway.sol` — Fiat integration
 
 ### Frontend
+
 - **Next.js 14** (App Router)
 - **TypeScript**
-- **TailwindCSS**
-- **shadcn/ui** components
+- **TailwindCSS** + **shadcn/ui**
 - **Wagmi v2** + **Viem**
-- **RainbowKit** wallet connection
+- **Supabase** (audit trail, transactions)
 
 ### Network
+
 - **Arc Testnet** (Chain ID: 5042002)
 - Cross-chain support: Ethereum, Arbitrum, Polygon, Base
 
@@ -92,70 +75,27 @@ Enterprise-grade financial infrastructure built on Arc Network. Ensures no capit
 ## Project Structure
 
 ```
-ArcLogistics/
-├── contracts/                    # Smart contracts (Hardhat)
+PayrollArena/
+├── contracts/
 │   ├── src/
-│   │   ├── core/
-│   │   │   └── TreasuryManager.sol      # Central treasury
-│   │   ├── adapters/
-│   │   │   └── YieldVaultAdapter.sol    # USYC wrapper
-│   │   ├── fx/
-│   │   │   └── FXExecutionEngine.sol    # StableFX RFQ
-│   │   ├── bridge/
-│   │   │   └── SettlementRouter.sol     # Arc Bridge Kit
-│   │   ├── fiat/
-│   │   │   └── CPNGateway.sol           # CPN integration
-│   │   ├── FreightEscrow.sol            # Shipment escrows
-│   │   ├── Treasury.sol                 # Legacy treasury
-│   │   ├── Settlement.sol               # FX settlement
-│   │   ├── BatchPayroll.sol             # Batch payments
-│   │   └── Mock*.sol                    # Test mocks
+│   │   ├── core/TreasuryManager.sol
+│   │   ├── adapters/YieldVaultAdapter.sol
+│   │   ├── fx/FXExecutionEngine.sol
+│   │   ├── bridge/SettlementRouter.sol
+│   │   └── fiat/CPNGateway.sol
 │   ├── interfaces/
-│   ├── scripts/
-│   └── test/
+│   ├── scripts/deploy-treasury-suite.ts
+│   └── test/TreasuryManager.test.ts
 │
-├── frontend/                     # Next.js frontend
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── api/
-│   │   │   │   ├── treasury/           # Treasury APIs
-│   │   │   │   ├── fx/                 # FX APIs
-│   │   │   │   └── settlement/         # Settlement APIs
-│   │   │   ├── (dashboard)/            # Dashboard pages
-│   │   │   ├── treasury/
-│   │   │   ├── escrow/
-│   │   │   ├── settlement/
-│   │   │   └── fx/
-│   │   ├── components/
-│   │   │   ├── dashboard/              # Dashboard components
-│   │   │   │   ├── DashboardLayout.tsx
-│   │   │   │   ├── BalanceOverview.tsx
-│   │   │   │   ├── YieldCard.tsx
-│   │   │   │   ├── FXWidget.tsx
-│   │   │   │   └── ChainBalances.tsx
-│   │   │   ├── escrow/
-│   │   │   ├── treasury/
-│   │   │   └── ui/                     # shadcn/ui
-│   │   ├── hooks/
-│   │   │   ├── useTreasury.ts          # Treasury hooks
-│   │   │   ├── useFX.ts                # FX hooks
-│   │   │   ├── useSettlement.ts        # Settlement hooks
-│   │   │   └── index.ts
-│   │   ├── lib/
-│   │   │   ├── services/
-│   │   │   │   ├── treasury.service.ts
-│   │   │   │   ├── fx.service.ts
-│   │   │   │   ├── settlement.service.ts
-│   │   │   │   └── cpn.service.ts
-│   │   │   ├── config.ts
-│   │   │   └── wagmi.ts
-│   │   ├── types/
-│   │   │   └── treasury.ts             # TypeScript types
-│   │   └── abi/                        # Contract ABIs
-│   └── public/
+├── frontend/
+│   ├── app/                  # Pages: /, /analytics, /settlements
+│   ├── abi/                  # Treasury Suite ABIs
+│   ├── components/           # shadcn/ui + custom components
+│   ├── hooks/                # Wagmi hooks for contract interaction
+│   └── lib/                  # Config, Supabase, utilities
 │
-├── ARCHITECTURE.md               # System architecture diagrams
-└── README.md
+├── supabase/migration.sql    # DB schema
+└── ARCHITECTURE.md           # System architecture diagrams
 ```
 
 ---
@@ -163,69 +103,49 @@ ArcLogistics/
 ## Setup
 
 ### Prerequisites
+
 - Node.js 18+
-- npm or yarn
 - MetaMask wallet
 - Arc Testnet USDC (from faucet)
 
-### 1. Clone and Install
+### 1. Install
 
 ```bash
 git clone <repo-url>
-cd ArcLogistics
+cd PayrollArena
 
 # Install contract dependencies
-cd contracts
-npm install
+cd contracts && npm install
 
 # Install frontend dependencies
-cd ../frontend
-npm install
+cd ../frontend && npm install
 ```
 
 ### 2. Configure Environment
 
-#### Contracts (`contracts/.env`)
-
-```bash
-cp .env.example .env
-```
-
-```env
-# Your wallet private key (DO NOT COMMIT)
-PRIVATE_KEY=your_private_key_here
-
-# Arc Testnet
-ARC_RPC_URL=https://rpc.testnet.arc.network
-ARC_CHAIN_ID=5042002
-```
-
 #### Frontend (`frontend/.env.local`)
 
-```bash
-cp .env.example .env.local
-```
-
 ```env
+# Network
+NEXT_PUBLIC_NETWORK_MODE=testnet
+NEXT_PUBLIC_CHAIN_ID=5042002
+NEXT_PUBLIC_RPC_URL=https://rpc.testnet.arc.network
+
 # Token Addresses
 NEXT_PUBLIC_USDC_ADDRESS=0x...
 NEXT_PUBLIC_EURC_ADDRESS=0x...
-NEXT_PUBLIC_USYC_ADDRESS=0x...
-NEXT_PUBLIC_STABLEFX_ADDRESS=0x...
+NEXT_PUBLIC_USYC_ADDRESS=0x9fdF14c5B14173D74C08Af27AebFf39240dC105A
 
-# Core Contract Addresses
-NEXT_PUBLIC_TREASURY_MANAGER_ADDRESS=0x...
-NEXT_PUBLIC_YIELD_ADAPTER_ADDRESS=0x...
-NEXT_PUBLIC_FX_ENGINE_ADDRESS=0x...
-NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS=0x...
-NEXT_PUBLIC_CPN_GATEWAY_ADDRESS=0x...
-NEXT_PUBLIC_FREIGHT_ESCROW_ADDRESS=0x...
-NEXT_PUBLIC_BATCH_PAYROLL_ADDRESS=0x...
+# Treasury Suite Contracts
+NEXT_PUBLIC_TREASURY_MANAGER_ADDRESS=0xB535b93cF7C249CE99965c22e952EFa322b2e4f9
+NEXT_PUBLIC_YIELD_ADAPTER_ADDRESS=0x9cD4aD9E9CD6d796e67a1369926ED50349137EA9
+NEXT_PUBLIC_FX_ENGINE_ADDRESS=0x63129e847496AA9931B48A827F82C45ddaDBd289
+NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS=0x6Ab2464aBd8205A1581C7011e0EeD104a11E905D
+NEXT_PUBLIC_CPN_GATEWAY_ADDRESS=0x43b3910E08c10551B0E0B0630dEA3d27a0d3995c
 
-# Chain Configuration
-NEXT_PUBLIC_CHAIN_ID=5042002
-NEXT_PUBLIC_RPC_URL=https://rpc.testnet.arc.network
-NEXT_PUBLIC_EXPLORER_URL=https://testnet.arcscan.app
+# Supabase (optional — falls back to mock data)
+NEXT_PUBLIC_SUPABASE_URL=https://...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 
 # WalletConnect
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
@@ -233,71 +153,39 @@ NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
 
 ### 3. Add Arc Testnet to MetaMask
 
-| Field | Value |
-|-------|-------|
-| Network Name | Arc Testnet |
-| RPC URL | https://rpc.testnet.arc.network |
-| Chain ID | 5042002 |
-| Currency Symbol | USDC |
-| Block Explorer | https://testnet.arcscan.app |
+| Field           | Value                           |
+| --------------- | ------------------------------- |
+| Network Name    | Arc Testnet                     |
+| RPC URL         | https://rpc.testnet.arc.network |
+| Chain ID        | 5042002                         |
+| Currency Symbol | USDC                            |
+| Block Explorer  | https://testnet.arcscan.app     |
 
----
-
-## Deployment
-
-### Compile Contracts
-
-```bash
-cd contracts
-npm run compile
-```
-
-### Deploy to Arc Testnet
-
-```bash
-npm run deploy
-# or
-npx hardhat run scripts/deploy.ts --network arcTestnet
-```
-
-The deploy script will:
-1. Deploy mock tokens (USDC, EURC, USYC, StableFX)
-2. Deploy core contracts
-3. Configure contract relationships
-4. Mint test tokens
-5. Output addresses for frontend config
-
----
-
-## Running the Frontend
+### 4. Run
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-Open http://10.0.3.227:3000 (or your local IP) in your browser.
-
-For LAN access, the dev server binds to your local IP automatically.
-
 ---
 
-## API Routes
+## Deployed Contracts (Arc Testnet)
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/treasury/balance` | GET | Get unified treasury balance |
-| `/api/treasury/yield` | GET | Get yield metrics |
-| `/api/fx/rates` | GET | Get current FX rates |
-| `/api/fx/quote` | POST | Request swap quote |
-| `/api/settlement/chains` | GET | Get supported chains |
-| `/api/settlement/route` | POST | Get settlement route |
+| Contract          | Address                                      |
+| ----------------- | -------------------------------------------- |
+| TreasuryManager   | `0xB535b93cF7C249CE99965c22e952EFa322b2e4f9` |
+| YieldVaultAdapter | `0x9cD4aD9E9CD6d796e67a1369926ED50349137EA9` |
+| FXExecutionEngine | `0x63129e847496AA9931B48A827F82C45ddaDBd289` |
+| SettlementRouter  | `0x6Ab2464aBd8205A1581C7011e0EeD104a11E905D` |
+| CPNGateway        | `0x43b3910E08c10551B0E0B0630dEA3d27a0d3995c` |
 
 ---
 
 ## Integration Flows
 
 ### USYC Yield Flow
+
 ```
 Treasury → Idle Detection → YieldAdapter → USYC Vault → Yield Accrual
                                     ↓
@@ -307,16 +195,19 @@ Treasury → Idle Detection → YieldAdapter → USYC Vault → Yield Accrual
 ```
 
 ### StableFX RFQ Flow
+
 ```
 Operator → Request Quote → Get Rate → Accept → Execute → Atomic PvP → Settlement
 ```
 
 ### Cross-Chain Settlement
+
 ```
 Treasury → Router → Calculate Route → Arc Bridge → Destination Chain → Recipient
 ```
 
 ### CPN Fiat Flow
+
 ```
 Bank (SEPA/Wire) → CPN → Mint USDC → Treasury
 Treasury → CPNGateway → Burn USDC → CPN → Bank (Wire)
@@ -324,78 +215,43 @@ Treasury → CPNGateway → Burn USDC → CPN → Bank (Wire)
 
 ---
 
-## Deployed Contracts (Arc Testnet)
+## Track Alignment
 
-| Contract | Address |
-|----------|---------|
-| MockUSDC | `0x5D2EF4689bd78E78aC6f25cBAb601B74a16597cB` |
-| MockEURC | `0x889dbe4EdD1A8b83BB34dD10CBc0e30725490dC9` |
-| MockUSYC | `0xfE7E6B7C10C59796Ed887774f83d80aa3865366D` |
-| MockStableFX | `0x1743B520179E2dbAabBC8587661CC5b7bE42f7c4` |
-| FreightEscrow | `0xf51eA88Ce8762021f8516393C4016d131d6FA085` |
-| Treasury | `0xDD7bB606DE0ABD7AEF79A5b3e257bf09fEcF6A48` |
-| Settlement | `0x8500aE3e1303a42110592AE268E4f1BDfed37a85` |
-| BatchPayroll | `0x5CcD00fD13dF4E3121ee1f4Ccd76253966b9fb86` |
+### Track 1: Global Payouts & Treasury
 
----
+- Circle Wallets, Circle Gateway (unified balance)
+- Arc Bridge Kit (cross-chain), CPN (fiat rails)
 
-## Development
+### Track 2: USYC & StableFX
 
-### Run Tests
-
-```bash
-cd contracts
-npm test
-```
-
-### Lint
-
-```bash
-cd frontend
-npm run lint
-```
-
----
-
-## Architecture
-
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture diagrams including:
-- System overview
-- Data flow diagrams
-- Contract hierarchy
-- Integration flows
+- USYC (yield layer), StableFX (FX layer)
 
 ---
 
 ## Key Design Decisions
 
-1. **Modular Contract Architecture**: Each integration (USYC, StableFX, Bridge, CPN) has its own contract module for clean separation and upgradability.
-
-2. **Service Layer Pattern**: Frontend uses a service layer abstraction over wagmi for cleaner code organization and testability.
-
-3. **Event-Driven Design**: All contracts emit comprehensive events for off-chain indexing and real-time updates.
-
-4. **Role-Based Access**: Three-tier permission system (Owner → Admin → Operator) for enterprise governance.
-
-5. **Fail-Safe Mechanisms**: All operations have refund/rollback capabilities for failed transactions.
+1. **Modular Contract Architecture** — Each integration (USYC, StableFX, Bridge, CPN) has its own contract for clean separation and upgradability
+2. **Real On-Chain Data** — Dashboard reads real wallet balances, no inflated mock values
+3. **AI Compliance Engine** — Audit trail auto-generates tax analysis for every conversion
+4. **Event-Driven Design** — All contracts emit events for off-chain indexing
+5. **Role-Based Access** — Three-tier permissions (Owner → Admin → Operator)
 
 ---
 
-## Security Considerations
+## Security
 
 - Private keys stored in `.env` files (never committed)
 - Large withdrawals require admin approval
 - Daily limits on fiat operations
 - Slippage protection on all swaps
-- Escrow dispute resolution mechanism
 
 ---
 
 ## Notes
 
-- Arc Testnet uses USDC as the native gas token
-- Mock tokens are used since Circle's real USYC/StableFX require whitelisting
-- `reference` is a reserved keyword in Solidity 0.8.20 - use `memo` instead
+- Arc Testnet uses **USDC as native gas token** (not ETH)
+- USYC is real Hashnote contract on Arc Testnet
+- Supabase audit trail falls back to mock data when not configured
 
 ---
 

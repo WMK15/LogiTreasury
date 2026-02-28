@@ -37,43 +37,23 @@ const EUR_USD_RATE = 0.92;
 // ============ Mock Data (Fallback) ============
 
 function getMockRecommendation(): TreasuryRecommendation {
-  const bankBalance = 245_000;
-  const onchainUsdc = 128_500;
-  const idleAmount = onchainUsdc;
-  const sweepAmount = idleAmount * SWEEP_PERCENTAGE;
-  const monthlyYield = (sweepAmount * CURRENT_TBILL_APY) / 12;
-  const annualYield = sweepAmount * CURRENT_TBILL_APY;
-
+  // Use real-world zero values — no mock money
   return {
-    shouldSweep: true,
-    idleUsdcAmount: idleAmount,
-    bankBalance,
-    totalOnchainUsdc: onchainUsdc,
-    sweepAmount,
-    projectedMonthlyYield: Number(monthlyYield.toFixed(2)),
-    projectedAnnualYield: Number(annualYield.toFixed(2)),
+    shouldSweep: false,
+    idleUsdcAmount: 0,
+    bankBalance: 0,
+    totalOnchainUsdc: 0,
+    sweepAmount: 0,
+    projectedMonthlyYield: 0,
+    projectedAnnualYield: 0,
     currentAPY: CURRENT_TBILL_APY * 100,
-    reasoning: `Your treasury has $${onchainUsdc.toLocaleString()} USDC sitting idle on-chain. This exceeds the $${IDLE_THRESHOLD_USD.toLocaleString()} threshold for automated yield optimization. By sweeping ${(SWEEP_PERCENTAGE * 100).toFixed(0)}% ($${sweepAmount.toLocaleString()}) into USYC (Hashnote T-Bill token), you would earn approximately $${monthlyYield.toFixed(2)}/month at the current ${(CURRENT_TBILL_APY * 100).toFixed(1)}% APY. USYC is backed by short-duration US Treasury Bills, providing institutional-grade security with daily liquidity.`,
+    reasoning: `Your treasury USDC balance is below the $${IDLE_THRESHOLD_USD.toLocaleString()} threshold for automated yield optimization. When idle USDC exceeds this threshold, the AI engine will recommend sweeping ${(SWEEP_PERCENTAGE * 100).toFixed(0)}% into USYC (Hashnote T-Bill token) for ~${(CURRENT_TBILL_APY * 100).toFixed(1)}% APY yield backed by US Treasury Bills.`,
     recommendations: [
       {
-        action: 'SWEEP_TO_USYC',
-        amount: sweepAmount,
-        description: `Sweep $${sweepAmount.toLocaleString()} into USYC T-Bill vault`,
-        expectedReturn: `~$${monthlyYield.toFixed(2)}/mo at ${(CURRENT_TBILL_APY * 100).toFixed(1)}% APY`,
-        urgency: 'HIGH',
-      },
-      {
-        action: 'FX_CONVERSION',
-        amount: 15_000,
-        description: 'Convert $15,000 USDC → EURC for upcoming EU settlements',
-        expectedReturn: `~€${(15_000 * EUR_USD_RATE).toLocaleString()} EURC at ${EUR_USD_RATE} rate`,
-        urgency: 'MEDIUM',
-      },
-      {
         action: 'HOLD',
-        amount: idleAmount - sweepAmount - 15_000,
-        description: 'Maintain liquid USDC buffer for operational needs',
-        expectedReturn: 'Liquidity buffer — no yield',
+        amount: 0,
+        description: 'No idle USDC above threshold — monitoring for sweep opportunity',
+        expectedReturn: `Sweep triggers at >$${IDLE_THRESHOLD_USD.toLocaleString()} idle`,
         urgency: 'LOW',
       },
     ],

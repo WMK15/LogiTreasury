@@ -46,8 +46,8 @@ export default function Dashboard() {
   const { data: escrowCount, isLoading: escrowLoading } = useEscrowCount();
   const { data: rates, isLoading: ratesLoading } = useCurrentRates();
 
-  // Mock bank balance for demo
-  const bankBalance = 245_000;
+  // Bank balance — $0 until real CPN/bank integration
+  const bankBalance = 0;
   const treasuryBalance = balanceSnapshot?.totalValue;
   const apy = yieldMetrics?.currentAPY;
   const fxRate = (rates as RateSnapshot)?.usdcToEurcRate;

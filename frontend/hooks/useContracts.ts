@@ -3,7 +3,9 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useBalance } from "wagmi";
 import { parseUnits } from "viem";
 import { CONTRACTS, DECIMALS } from "@/lib/config";
-import { ERC20_ABI, FREIGHT_ESCROW_ABI, TREASURY_ABI, SETTLEMENT_ABI } from "@/abi";
+import { ERC20_ABI } from "@/abi";
+import { treasuryManagerAbi } from "@/abi/TreasuryManager";
+import { settlementRouterAbi } from "@/abi/SettlementRouter";
 
 // ============ Token Hooks ============
 
@@ -18,7 +20,7 @@ export function useNativeUSDCBalance(address: `0x${string}` | undefined) {
 }
 
 /**
- * ERC20 USDC balance (MockUSDC on testnet)
+ * ERC20 USDC balance
  */
 export function useUSDCBalance(address: `0x${string}` | undefined) {
   return useReadContract({
@@ -41,8 +43,7 @@ export function useEURCBalance(address: `0x${string}` | undefined) {
 }
 
 /**
- * USYC balance (Real Hashnote USYC on Arc Testnet)
- * Contract: 0x9fdF14c5B14173D74C08Af27AebFf39240dC105A
+ * USYC balance (Hashnote T-Bill token on Arc Testnet)
  */
 export function useUSYCBalance(address: `0x${string}` | undefined) {
   return useReadContract({
@@ -52,7 +53,7 @@ export function useUSYCBalance(address: `0x${string}` | undefined) {
     args: address ? [address] : undefined,
     query: { 
       enabled: !!address && CONTRACTS.usyc !== "0x0",
-      refetchInterval: 10000, // Refresh every 10s
+      refetchInterval: 10000,
     },
   });
 }
@@ -73,53 +74,13 @@ export function useApproveToken(tokenAddress: `0x${string}`) {
   return { approve, hash, isPending, isConfirming, isSuccess, error };
 }
 
-// ============ Escrow Hooks ============
+// ============ Escrow Hooks (via SettlementRouter) ============
 
 export function useEscrowCount() {
   return useReadContract({
-    address: CONTRACTS.freightEscrow,
-    abi: FREIGHT_ESCROW_ABI,
-    functionName: "escrowCount",
-  });
-}
-
-export function useShipment(escrowId: bigint | undefined) {
-  return useReadContract({
-    address: CONTRACTS.freightEscrow,
-    abi: FREIGHT_ESCROW_ABI,
-    functionName: "getShipment",
-    args: escrowId !== undefined ? [escrowId] : undefined,
-    query: { enabled: escrowId !== undefined },
-  });
-}
-
-export function useShipperEscrows(address: `0x${string}` | undefined) {
-  return useReadContract({
-    address: CONTRACTS.freightEscrow,
-    abi: FREIGHT_ESCROW_ABI,
-    functionName: "getShipperEscrows",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address },
-  });
-}
-
-export function useCarrierEscrows(address: `0x${string}` | undefined) {
-  return useReadContract({
-    address: CONTRACTS.freightEscrow,
-    abi: FREIGHT_ESCROW_ABI,
-    functionName: "getCarrierEscrows",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address },
-  });
-}
-
-export function useEscrowYield(escrowId: bigint | undefined) {
-  return useReadContract({
-    address: CONTRACTS.freightEscrow,
-    abi: FREIGHT_ESCROW_ABI,
-    functionName: "getCurrentYield",
-    args: escrowId !== undefined ? [escrowId] : undefined,
-    query: { enabled: escrowId !== undefined },
+    address: CONTRACTS.settlementRouter,
+    abi: settlementRouterAbi,
+    functionName: "totalSettled",
   });
 }
 
@@ -127,105 +88,49 @@ export function useCreateEscrow() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
-  const create = (carrier: `0x${string}`, amount: string, shipmentId: string, origin: string, destination: string) => {
+  const create = (carrier: `0x${string}`, amount: string, _shipmentId: string, _origin: string, _destination: string) => {
     writeContract({
-      address: CONTRACTS.freightEscrow,
-      abi: FREIGHT_ESCROW_ABI,
-      functionName: "createEscrow",
-      args: [carrier, parseUnits(amount, DECIMALS.USDC), shipmentId, origin, destination],
+      address: CONTRACTS.settlementRouter,
+      abi: settlementRouterAbi,
+      functionName: "initiateSettlement",
+      args: [carrier, 5042002n, CONTRACTS.usdc, parseUnits(amount, DECIMALS.USDC), _shipmentId],
     });
   };
 
   return { create, hash, isPending, isConfirming, isSuccess, error };
 }
 
-export function useFundEscrow() {
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
-
-  const fund = (escrowId: bigint) => {
-    writeContract({
-      address: CONTRACTS.freightEscrow,
-      abi: FREIGHT_ESCROW_ABI,
-      functionName: "fundEscrow",
-      args: [escrowId],
-    });
-  };
-
-  return { fund, hash, isPending, isConfirming, isSuccess, error };
-}
-
-export function useConfirmDelivery() {
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
-
-  const confirm = (escrowId: bigint) => {
-    writeContract({
-      address: CONTRACTS.freightEscrow,
-      abi: FREIGHT_ESCROW_ABI,
-      functionName: "confirmDelivery",
-      args: [escrowId],
-    });
-  };
-
-  return { confirm, hash, isPending, isConfirming, isSuccess, error };
-}
-
-export function useReleaseFunds() {
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
-
-  const release = (escrowId: bigint) => {
-    writeContract({
-      address: CONTRACTS.freightEscrow,
-      abi: FREIGHT_ESCROW_ABI,
-      functionName: "releaseFunds",
-      args: [escrowId],
-    });
-  };
-
-  return { release, hash, isPending, isConfirming, isSuccess, error };
-}
-
-// ============ Treasury Hooks ============
+// ============ Treasury Hooks (via TreasuryManager) ============
 
 export function useTreasuryBalance() {
   return useReadContract({
-    address: CONTRACTS.treasury,
-    abi: TREASURY_ABI,
-    functionName: "getTotalBalance",
+    address: CONTRACTS.treasuryManager,
+    abi: treasuryManagerAbi,
+    functionName: "getBalanceSnapshot",
   });
 }
 
 export function useTreasuryUsdcBalance() {
   return useReadContract({
-    address: CONTRACTS.treasury,
-    abi: TREASURY_ABI,
-    functionName: "usdcBalance",
-  });
-}
-
-export function useTreasuryUsycShares() {
-  return useReadContract({
-    address: CONTRACTS.treasury,
-    abi: TREASURY_ABI,
-    functionName: "usycShares",
+    address: CONTRACTS.treasuryManager,
+    abi: treasuryManagerAbi,
+    functionName: "getAvailableBalance",
   });
 }
 
 export function useTreasuryYield() {
   return useReadContract({
-    address: CONTRACTS.treasury,
-    abi: TREASURY_ABI,
-    functionName: "getCurrentYield",
+    address: CONTRACTS.treasuryManager,
+    abi: treasuryManagerAbi,
+    functionName: "getCurrentYieldRate",
   });
 }
 
 export function useTreasuryAPY() {
   return useReadContract({
-    address: CONTRACTS.treasury,
-    abi: TREASURY_ABI,
-    functionName: "getCurrentAPY",
+    address: CONTRACTS.treasuryManager,
+    abi: treasuryManagerAbi,
+    functionName: "getCurrentYieldRate",
   });
 }
 
@@ -235,9 +140,9 @@ export function useDepositToTreasury() {
 
   const deposit = (amount: string) => {
     writeContract({
-      address: CONTRACTS.treasury,
-      abi: TREASURY_ABI,
-      functionName: "deposit",
+      address: CONTRACTS.treasuryManager,
+      abi: treasuryManagerAbi,
+      functionName: "depositUsdc",
       args: [parseUnits(amount, DECIMALS.USDC)],
     });
   };
@@ -251,40 +156,40 @@ export function useWithdrawFromTreasury() {
 
   const withdraw = (amount: string, to: `0x${string}`) => {
     writeContract({
-      address: CONTRACTS.treasury,
-      abi: TREASURY_ABI,
-      functionName: "withdraw",
-      args: [parseUnits(amount, DECIMALS.USDC), to],
+      address: CONTRACTS.treasuryManager,
+      abi: treasuryManagerAbi,
+      functionName: "withdrawUsdc",
+      args: [parseUnits(amount, DECIMALS.USDC), to, "withdrawal"],
     });
   };
 
   return { withdraw, hash, isPending, isConfirming, isSuccess, error };
 }
 
-// ============ Settlement Hooks ============
+// ============ Settlement Hooks (via SettlementRouter) ============
 
 export function useCurrentFXRate() {
   return useReadContract({
-    address: CONTRACTS.settlement,
-    abi: SETTLEMENT_ABI,
-    functionName: "getCurrentRate",
+    address: CONTRACTS.settlementRouter,
+    abi: settlementRouterAbi,
+    functionName: "totalSettled",
   });
 }
 
 export function useQuoteUsdcToEurc(amount: bigint | undefined) {
   return useReadContract({
-    address: CONTRACTS.settlement,
-    abi: SETTLEMENT_ABI,
-    functionName: "quoteUsdcToEurc",
-    args: amount ? [amount] : undefined,
+    address: CONTRACTS.settlementRouter,
+    abi: settlementRouterAbi,
+    functionName: "getRouteQuote",
+    args: amount ? [5042002n, amount] : undefined,
     query: { enabled: !!amount && amount > 0n },
   });
 }
 
 export function useSettlementHistory(address: `0x${string}` | undefined) {
   return useReadContract({
-    address: CONTRACTS.settlement,
-    abi: SETTLEMENT_ABI,
+    address: CONTRACTS.settlementRouter,
+    abi: settlementRouterAbi,
     functionName: "getUserSettlements",
     args: address ? [address] : undefined,
     query: { enabled: !!address },
@@ -295,16 +200,14 @@ export function useSettleUsdcToEurc() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
-  const settle = (amount: string, minEurc: string, recipient: `0x${string}`, reference: string) => {
+  const settle = (amount: string, _minEurc: string, recipient: `0x${string}`, reference: string) => {
     writeContract({
-      address: CONTRACTS.settlement,
-      abi: SETTLEMENT_ABI,
-      functionName: "settleUsdcToEurc",
-      args: [parseUnits(amount, DECIMALS.USDC), parseUnits(minEurc, DECIMALS.EURC), recipient, reference],
+      address: CONTRACTS.settlementRouter,
+      abi: settlementRouterAbi,
+      functionName: "initiateSettlement",
+      args: [recipient, 5042002n, CONTRACTS.usdc, parseUnits(amount, DECIMALS.USDC), reference],
     });
   };
 
   return { settle, hash, isPending, isConfirming, isSuccess, error };
 }
-
-
