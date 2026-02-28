@@ -10,49 +10,61 @@ import { USDC_DECIMALS } from "@/lib/config";
 export default function EmployeePage() {
   const { address, isConnected } = useAccount();
 
-  // Read hooks
   const { data: usdcBalance } = useUSDCBalance(address);
   const { data: payrollIds } = useEmployeePayrolls(address);
 
   if (!isConnected) {
     return (
-      <div className="text-center py-16">
-        <h1 className="text-3xl font-bold mb-4">Employee Dashboard</h1>
-        <p className="text-gray-400 mb-8">Connect your wallet to view and claim payrolls</p>
+      <div className="pt-16">
+        <p className="text-sm text-neutral-400 mb-4">Connect wallet to continue</p>
         <ConnectButton />
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Employee Dashboard</h1>
-
-      {/* Balance Overview */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <div className="card">
-          <p className="text-sm text-gray-400 mb-1">Wallet Balance</p>
-          <p className="text-2xl font-bold text-primary-400">
-            ${usdcBalance ? formatUnits(usdcBalance, USDC_DECIMALS) : "0"} USDC
-          </p>
-        </div>
-        <div className="card">
-          <p className="text-sm text-gray-400 mb-1">Active Payrolls</p>
-          <p className="text-2xl font-bold">{payrollIds?.length || 0}</p>
-        </div>
+    <div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-sm font-medium text-neutral-100">Employee</h1>
       </div>
 
-      {/* Payroll List */}
-      <div className="card">
-        <h2 className="text-xl font-semibold mb-4">Your Payrolls</h2>
+      {/* KPIs */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <KPI 
+          label="Balance" 
+          value={usdcBalance ? formatUnits(usdcBalance, USDC_DECIMALS) : "0"} 
+          suffix="USDC"
+        />
+        <KPI 
+          label="Payrolls" 
+          value={payrollIds?.length?.toString() || "0"} 
+        />
+      </div>
+
+      {/* Payrolls */}
+      <div>
+        <p className="text-xs text-neutral-500 uppercase tracking-wide mb-3">Payrolls</p>
         {payrollIds && payrollIds.length > 0 ? (
           <PayrollList payrollIds={payrollIds} role="employee" />
         ) : (
-          <p className="text-gray-500 text-center py-8">
-            No payrolls found. Your employer needs to create a payroll for you.
-          </p>
+          <div className="card">
+            <p className="text-sm text-neutral-500">No payrolls</p>
+          </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function KPI({ label, value, suffix }: { label: string; value: string; suffix?: string }) {
+  return (
+    <div className="card">
+      <p className="kpi-label mb-1">{label}</p>
+      <p className="kpi-value">
+        {value}
+        {suffix && <span className="text-neutral-500 text-sm ml-1">{suffix}</span>}
+      </p>
     </div>
   );
 }

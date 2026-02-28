@@ -26,13 +26,6 @@ const statusLabels: Record<PayrollStatus, string> = {
   [PayrollStatus.CANCELLED]: "Cancelled",
 };
 
-const statusClasses: Record<PayrollStatus, string> = {
-  [PayrollStatus.ACTIVE]: "status-active",
-  [PayrollStatus.DISPUTED]: "status-disputed",
-  [PayrollStatus.COMPLETED]: "status-completed",
-  [PayrollStatus.CANCELLED]: "status-cancelled",
-};
-
 export function PayrollCard({ payrollId, role }: Props) {
   const { data: payroll, isLoading } = usePayroll(payrollId);
   const { data: milestones } = useMilestones(payrollId);
@@ -46,9 +39,9 @@ export function PayrollCard({ payrollId, role }: Props) {
 
   if (isLoading || !payroll) {
     return (
-      <div className="card animate-pulse">
-        <div className="h-4 bg-gray-700 rounded w-1/4 mb-2"></div>
-        <div className="h-6 bg-gray-700 rounded w-1/2"></div>
+      <div className="card">
+        <div className="h-4 skeleton w-24 mb-2" />
+        <div className="h-4 skeleton w-16" />
       </div>
     );
   }
@@ -64,94 +57,96 @@ export function PayrollCard({ payrollId, role }: Props) {
     }
   };
 
+  const statusClass = {
+    [PayrollStatus.ACTIVE]: "status-active",
+    [PayrollStatus.DISPUTED]: "status-disputed",
+    [PayrollStatus.COMPLETED]: "status-completed",
+    [PayrollStatus.CANCELLED]: "status-cancelled",
+  }[payroll.status as PayrollStatus];
+
   return (
     <div className="card">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm text-gray-400">Payroll #{payrollId.toString()}</span>
-            <span className={statusClasses[payroll.status as PayrollStatus]}>
-              {statusLabels[payroll.status as PayrollStatus]}
-            </span>
-            <span className="text-xs bg-gray-700 px-2 py-0.5 rounded">
-              {isVesting ? "Vesting" : "Milestone"}
-            </span>
-          </div>
-          <p className="text-sm text-gray-400">
-            {role === "employer" ? (
-              <>To: <code className="text-xs">{payroll.employee}</code></>
-            ) : (
-              <>From: <code className="text-xs">{payroll.employer}</code></>
-            )}
-          </p>
+      {/* Header Row */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-neutral-400">#{payrollId.toString()}</span>
+          <span className={statusClass}>
+            {statusLabels[payroll.status as PayrollStatus]}
+          </span>
+          <span className="text-xs text-neutral-600">
+            {isVesting ? "Vesting" : "Milestone"}
+          </span>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-bold">
-            ${formatUnits(payroll.totalAmount, USDC_DECIMALS)}
-          </p>
-          <p className="text-sm text-gray-400">
-            Claimed: ${formatUnits(payroll.claimedAmount, USDC_DECIMALS)}
-          </p>
+          <span className="text-sm font-medium tabular-nums">
+            {formatUnits(payroll.totalAmount, USDC_DECIMALS)}
+          </span>
+          <span className="text-neutral-500 text-sm ml-1">USDC</span>
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {/* Address */}
+      <div className="text-xs text-neutral-500 mb-4 font-mono truncate">
+        {role === "employer" ? payroll.employee : payroll.employer}
+      </div>
+
+      {/* Progress */}
       <div className="mb-4">
-        <div className="flex justify-between text-xs text-gray-400 mb-1">
+        <div className="flex justify-between text-xs text-neutral-500 mb-1">
           <span>Progress</span>
-          <span>{progress}%</span>
+          <span className="tabular-nums">{progress}%</span>
         </div>
-        <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+        <div className="h-1 bg-neutral-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary-500 transition-all"
+            className="h-full bg-neutral-500 transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
+        <div className="text-xs text-neutral-500 mt-1 tabular-nums">
+          {formatUnits(payroll.claimedAmount, USDC_DECIMALS)} claimed
+        </div>
       </div>
 
-      {/* Milestones (if milestone-based) */}
+      {/* Milestones */}
       {!isVesting && milestones && milestones.length > 0 && (
         <div className="mb-4">
-          <p className="text-sm font-medium mb-2">Milestones</p>
-          <div className="space-y-2">
+          <p className="text-xs text-neutral-500 uppercase tracking-wide mb-2">Milestones</p>
+          <div className="space-y-1">
             {milestones.map((m, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between text-sm bg-gray-800 p-2 rounded"
+                className="flex items-center justify-between py-2 px-3 rounded-md bg-neutral-800/50 row-hover"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <span
-                    className={`w-2 h-2 rounded-full ${
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                       m.approved
-                        ? "bg-green-500"
+                        ? "bg-emerald-500"
                         : m.completed
-                        ? "bg-yellow-500"
-                        : "bg-gray-500"
+                        ? "bg-amber-500"
+                        : "bg-neutral-600"
                     }`}
                   />
-                  <span>{m.description}</span>
+                  <span className="text-sm text-neutral-300 truncate">{m.description}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">
-                    ${formatUnits(m.amount, USDC_DECIMALS)}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-sm text-neutral-500 tabular-nums">
+                    {formatUnits(m.amount, USDC_DECIMALS)}
                   </span>
-                  {/* Employee: Mark Complete */}
                   {role === "employee" && !m.completed && payroll.status === PayrollStatus.ACTIVE && (
                     <button
                       onClick={() => markComplete(payrollId, BigInt(i))}
                       disabled={isMarking}
-                      className="text-xs btn-secondary py-1 px-2"
+                      className="btn-ghost text-xs h-6 px-2"
                     >
-                      Complete
+                      Done
                     </button>
                   )}
-                  {/* Employer: Approve */}
                   {role === "employer" && m.completed && !m.approved && payroll.status === PayrollStatus.ACTIVE && (
                     <button
                       onClick={() => approveMilestone(payrollId, BigInt(i))}
                       disabled={isApproving}
-                      className="text-xs btn-primary py-1 px-2"
+                      className="btn-secondary text-xs h-6 px-2"
                     >
                       Approve
                     </button>
@@ -164,26 +159,24 @@ export function PayrollCard({ payrollId, role }: Props) {
       )}
 
       {/* Actions */}
-      <div className="flex gap-2 flex-wrap">
-        {/* Employee: Claim */}
+      <div className="flex gap-2">
         {role === "employee" && claimable && claimable > 0n && payroll.status === PayrollStatus.ACTIVE && (
           <button
             onClick={handleClaim}
             disabled={isClaimingVested || isClaimingMilestone}
             className="btn-primary"
           >
-            Claim ${formatUnits(claimable, USDC_DECIMALS)} USDC
+            Claim {formatUnits(claimable, USDC_DECIMALS)}
           </button>
         )}
 
-        {/* Employer: Raise Dispute */}
         {role === "employer" && payroll.status === PayrollStatus.ACTIVE && (
           <button
             onClick={() => raiseDispute(payrollId)}
             disabled={isDisputing}
             className="btn-danger"
           >
-            Raise Dispute
+            Dispute
           </button>
         )}
       </div>

@@ -5,47 +5,88 @@
 @layer base {
   body {
     @apply antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  * {
+    @apply border-neutral-800;
   }
 }
 
 @layer components {
+  .btn {
+    @apply inline-flex items-center justify-center text-sm font-medium h-8 px-3 rounded-md transition-all duration-150 ease-out disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply btn bg-neutral-100 text-neutral-950 hover:bg-neutral-200 active:bg-neutral-300;
   }
 
   .btn-secondary {
-    @apply bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply btn bg-neutral-800 text-neutral-200 hover:bg-neutral-700 hover:text-neutral-100;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100;
   }
 
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply btn bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20;
   }
 
   .card {
-    @apply bg-gray-900 border border-gray-800 rounded-xl p-6;
+    @apply bg-neutral-900 border border-neutral-800 rounded-md p-5;
   }
 
   .input {
-    @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full h-9 bg-neutral-900 border border-neutral-800 rounded-md px-3 text-sm text-neutral-100 placeholder-neutral-500 transition-colors duration-150 focus:outline-none focus:border-neutral-600 focus:ring-1 focus:ring-neutral-600;
   }
 
   .label {
-    @apply block text-sm font-medium text-gray-300 mb-2;
+    @apply block text-xs font-medium text-neutral-400 mb-1.5 uppercase tracking-wide;
   }
 
   .status-active {
-    @apply bg-green-500/20 text-green-400 px-2 py-1 rounded text-sm;
+    @apply text-emerald-400 text-xs font-medium;
   }
 
   .status-disputed {
-    @apply bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-sm;
+    @apply text-amber-400 text-xs font-medium;
   }
 
   .status-completed {
-    @apply bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-sm;
+    @apply text-neutral-400 text-xs font-medium;
   }
 
   .status-cancelled {
-    @apply bg-gray-500/20 text-gray-400 px-2 py-1 rounded text-sm;
+    @apply text-neutral-500 text-xs font-medium;
+  }
+
+  .kpi-value {
+    @apply text-lg font-medium text-neutral-100 tabular-nums;
+  }
+
+  .kpi-label {
+    @apply text-xs text-neutral-500 uppercase tracking-wide;
+  }
+
+  .tab {
+    @apply text-sm font-medium px-3 py-1.5 rounded-md transition-colors duration-150;
+  }
+
+  .tab-active {
+    @apply tab bg-neutral-800 text-neutral-100;
+  }
+
+  .tab-inactive {
+    @apply tab text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50;
+  }
+
+  .row-hover {
+    @apply transition-colors duration-150 hover:bg-neutral-800/40;
+  }
+
+  .skeleton {
+    @apply bg-neutral-800 animate-pulse rounded;
   }
 }

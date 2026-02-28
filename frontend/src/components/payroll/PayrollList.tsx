@@ -10,14 +10,14 @@ interface Props {
 export function PayrollList({ payrollIds, role }: Props) {
   if (!payrollIds || payrollIds.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        No payrolls found
+      <div className="card">
+        <p className="text-sm text-neutral-500">No payrolls</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {payrollIds.map((id) => (
         <PayrollCard key={id.toString()} payrollId={id} role={role} />
       ))}

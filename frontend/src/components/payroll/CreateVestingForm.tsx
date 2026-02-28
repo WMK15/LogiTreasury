@@ -37,19 +37,17 @@ export function CreateVestingForm({ onSuccess }: Props) {
     });
   };
 
-  // Reset form on success
   if (isSuccess) {
     onSuccess();
   }
 
   return (
     <div className="card">
-      <h2 className="text-xl font-semibold mb-6">Create Vesting Payroll</h2>
+      <p className="text-xs text-neutral-500 uppercase tracking-wide mb-4">New Vesting Payroll</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Employee Address */}
         <div>
-          <label className="label">Employee Address</label>
+          <label className="label">Employee</label>
           <input
             type="text"
             placeholder="0x..."
@@ -57,32 +55,30 @@ export function CreateVestingForm({ onSuccess }: Props) {
             onChange={(e) =>
               setFormData({ ...formData, employee: e.target.value })
             }
-            className="input"
+            className="input font-mono"
             required
           />
         </div>
 
-        {/* Amount */}
         <div>
-          <label className="label">Total Amount (USDC)</label>
+          <label className="label">Amount</label>
           <input
             type="number"
-            placeholder="1000"
+            placeholder="0.00"
             value={formData.amount}
             onChange={(e) =>
               setFormData({ ...formData, amount: e.target.value })
             }
-            className="input"
+            className="input tabular-nums"
             required
             min="0"
             step="0.01"
           />
         </div>
 
-        {/* Dates */}
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="label">Vesting Start Date</label>
+            <label className="label">Start</label>
             <input
               type="datetime-local"
               value={formData.startDate}
@@ -94,7 +90,7 @@ export function CreateVestingForm({ onSuccess }: Props) {
             />
           </div>
           <div>
-            <label className="label">Vesting End Date</label>
+            <label className="label">End</label>
             <input
               type="datetime-local"
               value={formData.endDate}
@@ -107,26 +103,22 @@ export function CreateVestingForm({ onSuccess }: Props) {
           </div>
         </div>
 
-        {/* Cliff & Dispute */}
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="label">Cliff Period (Days)</label>
+            <label className="label">Cliff (days)</label>
             <input
               type="number"
               value={formData.cliffDays}
               onChange={(e) =>
                 setFormData({ ...formData, cliffDays: parseInt(e.target.value) })
               }
-              className="input"
+              className="input tabular-nums"
               min="0"
               max="365"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              No funds claimable until cliff ends
-            </p>
           </div>
           <div>
-            <label className="label">Dispute Window (Days)</label>
+            <label className="label">Dispute window (days)</label>
             <input
               type="number"
               value={formData.disputeWindowDays}
@@ -136,32 +128,29 @@ export function CreateVestingForm({ onSuccess }: Props) {
                   disputeWindowDays: parseInt(e.target.value),
                 })
               }
-              className="input"
+              className="input tabular-nums"
               min="1"
               max="30"
             />
-            <p className="text-xs text-gray-500 mt-1">1-30 days allowed</p>
           </div>
         </div>
 
-        {/* Error Display */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
+          <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md p-3">
             {error.message}
           </div>
         )}
 
-        {/* Submit */}
         <button
           type="submit"
           disabled={isPending || isConfirming}
           className="btn-primary w-full"
         >
           {isPending
-            ? "Confirm in Wallet..."
+            ? "Confirm..."
             : isConfirming
-            ? "Creating Payroll..."
-            : "Create Vesting Payroll"}
+            ? "Creating..."
+            : "Create"}
         </button>
       </form>
     </div>

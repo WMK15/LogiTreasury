@@ -21,67 +21,63 @@ export default function TreasuryPage() {
 
   if (!isConnected) {
     return (
-      <div className="text-center py-16">
-        <h1 className="text-3xl font-bold mb-4">Treasury Overview</h1>
-        <p className="text-gray-400 mb-8">Connect your wallet to view treasury status</p>
+      <div className="pt-16">
+        <p className="text-sm text-neutral-400 mb-4">Connect wallet to continue</p>
         <ConnectButton />
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Treasury Overview</h1>
+    <div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-sm font-medium text-neutral-100">Treasury</h1>
+      </div>
 
-      {/* Contract Info */}
+      {/* Contracts */}
       <div className="card mb-6">
-        <h2 className="text-lg font-semibold mb-4">Contract Addresses</h2>
+        <p className="text-xs text-neutral-500 uppercase tracking-wide mb-3">Contracts</p>
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-400">PayrollArena:</span>
-            <code className="text-primary-400">{CONTRACT_ADDRESSES.payrollArena}</code>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">USDC:</span>
-            <code className="text-primary-400">{CONTRACT_ADDRESSES.usdc}</code>
-          </div>
+          <Row label="PayrollArena" value={CONTRACT_ADDRESSES.payrollArena} mono />
+          <Row label="USDC" value={CONTRACT_ADDRESSES.usdc} mono />
         </div>
       </div>
 
-      {/* Balance Cards */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
+      {/* Balances */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="card">
-          <h3 className="text-sm text-gray-400 mb-1">Your Treasury Balance</h3>
-          <p className="text-3xl font-bold text-primary-400">
-            ${treasuryBalance ? formatUnits(treasuryBalance, USDC_DECIMALS) : "0"}
+          <p className="kpi-label mb-1">Treasury</p>
+          <p className="kpi-value">
+            {treasuryBalance ? formatUnits(treasuryBalance, USDC_DECIMALS) : "0"}
+            <span className="text-neutral-500 text-sm ml-1">USDC</span>
           </p>
-          <p className="text-xs text-gray-500 mt-1">USDC deposited in contract</p>
         </div>
         <div className="card">
-          <h3 className="text-sm text-gray-400 mb-1">Wallet USDC Balance</h3>
-          <p className="text-3xl font-bold">
-            ${usdcBalance ? formatUnits(usdcBalance, USDC_DECIMALS) : "0"}
+          <p className="kpi-label mb-1">Wallet</p>
+          <p className="kpi-value">
+            {usdcBalance ? formatUnits(usdcBalance, USDC_DECIMALS) : "0"}
+            <span className="text-neutral-500 text-sm ml-1">USDC</span>
           </p>
-          <p className="text-xs text-gray-500 mt-1">USDC in your wallet</p>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-4">
         <div className="card">
-          <h3 className="text-lg font-semibold mb-4">As Employer</h3>
-          <div className="space-y-3">
-            <StatRow label="Total Payrolls Created" value={employerPayrolls?.length || 0} />
-            <StatRow label="Active" value="-" />
-            <StatRow label="Completed" value="-" />
+          <p className="text-xs text-neutral-500 uppercase tracking-wide mb-3">As Employer</p>
+          <div className="space-y-2">
+            <Row label="Total" value={employerPayrolls?.length || 0} />
+            <Row label="Active" value="—" />
+            <Row label="Completed" value="—" />
           </div>
         </div>
         <div className="card">
-          <h3 className="text-lg font-semibold mb-4">As Employee</h3>
-          <div className="space-y-3">
-            <StatRow label="Total Payrolls Received" value={employeePayrolls?.length || 0} />
-            <StatRow label="Claimable" value="-" />
-            <StatRow label="Total Claimed" value="-" />
+          <p className="text-xs text-neutral-500 uppercase tracking-wide mb-3">As Employee</p>
+          <div className="space-y-2">
+            <Row label="Total" value={employeePayrolls?.length || 0} />
+            <Row label="Claimable" value="—" />
+            <Row label="Claimed" value="—" />
           </div>
         </div>
       </div>
@@ -89,11 +85,21 @@ export default function TreasuryPage() {
   );
 }
 
-function StatRow({ label, value }: { label: string; value: string | number }) {
+function Row({ 
+  label, 
+  value, 
+  mono 
+}: { 
+  label: string; 
+  value: string | number; 
+  mono?: boolean;
+}) {
   return (
-    <div className="flex justify-between items-center">
-      <span className="text-gray-400 text-sm">{label}</span>
-      <span className="font-medium">{value}</span>
+    <div className="flex justify-between items-center text-sm">
+      <span className="text-neutral-500">{label}</span>
+      <span className={`text-neutral-200 ${mono ? "font-mono text-xs" : "tabular-nums"}`}>
+        {value}
+      </span>
     </div>
   );
 }

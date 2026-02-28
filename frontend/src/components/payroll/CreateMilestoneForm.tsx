@@ -71,71 +71,67 @@ export function CreateMilestoneForm({ onSuccess }: Props) {
 
   return (
     <div className="card">
-      <h2 className="text-xl font-semibold mb-6">Create Milestone Payroll</h2>
+      <p className="text-xs text-neutral-500 uppercase tracking-wide mb-4">New Milestone Payroll</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Employee Address */}
         <div>
-          <label className="label">Employee Address</label>
+          <label className="label">Employee</label>
           <input
             type="text"
             placeholder="0x..."
             value={employee}
             onChange={(e) => setEmployee(e.target.value)}
-            className="input"
+            className="input font-mono"
             required
           />
         </div>
 
-        {/* Milestones */}
         <div>
           <div className="flex justify-between items-center mb-2">
             <label className="label mb-0">Milestones</label>
             <button
               type="button"
               onClick={addMilestone}
-              className="text-sm text-primary-400 hover:text-primary-300"
+              className="text-xs text-neutral-400 hover:text-neutral-200 transition-colors"
             >
-              + Add Milestone
+              + Add
             </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {milestones.map((milestone, index) => (
               <div
                 key={index}
-                className="flex gap-3 items-start bg-gray-800 p-3 rounded-lg"
+                className="flex gap-2 items-center bg-neutral-800/50 p-2 rounded-md"
               >
-                <span className="text-gray-500 text-sm mt-2">#{index + 1}</span>
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    placeholder="Milestone description"
-                    value={milestone.description}
-                    onChange={(e) =>
-                      updateMilestone(index, "description", e.target.value)
-                    }
-                    className="input mb-2"
-                    required
-                  />
-                  <input
-                    type="number"
-                    placeholder="Amount (USDC)"
-                    value={milestone.amount}
-                    onChange={(e) =>
-                      updateMilestone(index, "amount", e.target.value)
-                    }
-                    className="input"
-                    required
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
+                <span className="text-neutral-600 text-xs w-4">{index + 1}</span>
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={milestone.description}
+                  onChange={(e) =>
+                    updateMilestone(index, "description", e.target.value)
+                  }
+                  className="input flex-1"
+                  required
+                />
+                <input
+                  type="number"
+                  placeholder="Amount"
+                  value={milestone.amount}
+                  onChange={(e) =>
+                    updateMilestone(index, "amount", e.target.value)
+                  }
+                  className="input w-28 tabular-nums"
+                  required
+                  min="0"
+                  step="0.01"
+                />
                 {milestones.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeMilestone(index)}
-                    className="text-red-400 hover:text-red-300 mt-2"
+                    className="text-neutral-500 hover:text-red-400 transition-colors text-xs px-2"
                   >
                     Remove
                   </button>
@@ -144,45 +140,40 @@ export function CreateMilestoneForm({ onSuccess }: Props) {
             ))}
           </div>
 
-          <div className="text-right mt-2 text-sm">
-            Total:{" "}
-            <span className="font-semibold text-primary-400">
-              ${totalAmount.toFixed(2)} USDC
-            </span>
+          <div className="text-right mt-2 text-sm tabular-nums">
+            <span className="text-neutral-500">Total:</span>{" "}
+            <span className="text-neutral-200">{totalAmount.toFixed(2)}</span>
           </div>
         </div>
 
-        {/* Dispute Window */}
         <div>
-          <label className="label">Dispute Window (Days)</label>
+          <label className="label">Dispute window (days)</label>
           <input
             type="number"
             value={disputeWindowDays}
             onChange={(e) => setDisputeWindowDays(parseInt(e.target.value))}
-            className="input"
+            className="input w-24 tabular-nums"
             min="1"
             max="30"
           />
         </div>
 
-        {/* Error Display */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
+          <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md p-3">
             {error.message}
           </div>
         )}
 
-        {/* Submit */}
         <button
           type="submit"
           disabled={isPending || isConfirming || totalAmount === 0}
           className="btn-primary w-full"
         >
           {isPending
-            ? "Confirm in Wallet..."
+            ? "Confirm..."
             : isConfirming
-            ? "Creating Payroll..."
-            : "Create Milestone Payroll"}
+            ? "Creating..."
+            : "Create"}
         </button>
       </form>
     </div>
