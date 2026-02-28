@@ -8,9 +8,8 @@ const navItems = [
   { href: "/", label: "Overview", icon: "◉" },
   { href: "/escrow", label: "Freight Escrow", icon: "◈" },
   { href: "/treasury", label: "Treasury", icon: "◇" },
+  { href: "/settlement", label: "FX Settlement", icon: "⬡" },
   { href: "/fiat", label: "Fiat (CPN)", icon: "€" },
-  { href: "/settlement", label: "Settlement", icon: "⬡" },
-  { href: "/payroll", label: "Payroll", icon: "▤" },
 ];
 
 export function Sidebar() {

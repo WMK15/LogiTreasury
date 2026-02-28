@@ -6,12 +6,21 @@ All notable changes to the ArcLogistics Treasury project are documented here.
 
 ## [Unreleased] - Hackathon Final Sprint
 
+### Removed
+- **Payroll feature** - Removed entirely to focus on core logistics treasury flow:
+  - Deleted `/payroll` page
+  - Removed payroll hooks from `useContracts.ts`
+  - Removed payroll types and navigation links
+  - Removed `batchPayroll` from contracts config
+
 ### Planned
 - **Real USYC Integration** - Connect to Hashnote USYC on Arc Testnet via usyc.dev.hashnote.com
 - **StableFX API Integration** - Implement RFQ flow with Circle StableFX API
 - **Escrow GPS/Signature Toggles** - Demo simulation for delivery verification
-- **Fiat Demo Mode** - Pre-populated mock bank account for CPN demo
 - **Deep Savings Counter** - Prominent yield display
+
+### Changed
+- **Fiat Demo Mode** - Pre-populated mock bank account for CPN demo (completed)
 
 ---
 

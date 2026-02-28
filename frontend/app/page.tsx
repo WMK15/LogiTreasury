@@ -9,7 +9,6 @@ import {
   useUSDCBalance,
   useEURCBalance,
   useEscrowCount,
-  useBatchCount,
 } from "@/hooks/useContracts";
 import { useTreasuryDashboard } from "@/hooks/useTreasury";
 import { useCurrentRates } from "@/hooks/useFX";
@@ -24,7 +23,6 @@ export default function Overview() {
   const { data: eurcBalance, isLoading: eurcLoading } = useEURCBalance(address);
   const { balanceSnapshot, yieldMetrics, isLoading: treasuryLoading } = useTreasuryDashboard();
   const { data: escrowCount, isLoading: escrowLoading } = useEscrowCount();
-  const { data: batchCount, isLoading: batchLoading } = useBatchCount();
   const { data: rates, isLoading: ratesLoading } = useCurrentRates();
 
   const treasuryBalance = balanceSnapshot?.totalValue;
@@ -86,7 +84,7 @@ export default function Overview() {
       </div>
 
       {/* Secondary KPIs */}
-      <div className="grid grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-4 gap-4 mb-8">
         <KPI
           label="Native USDC"
           value={nativeBalance ? Number(nativeBalance.formatted).toFixed(2) : "0.00"}
@@ -107,11 +105,6 @@ export default function Overview() {
           label="Active Escrows" 
           value={escrowCount?.toString() || "0"} 
           loading={escrowLoading}
-        />
-        <KPI 
-          label="Payroll Batches" 
-          value={batchCount?.toString() || "0"} 
-          loading={batchLoading}
         />
       </div>
 

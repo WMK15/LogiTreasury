@@ -3,7 +3,7 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useBalance } from "wagmi";
 import { parseUnits } from "viem";
 import { CONTRACTS, DECIMALS } from "@/lib/config";
-import { ERC20_ABI, FREIGHT_ESCROW_ABI, TREASURY_ABI, SETTLEMENT_ABI, BATCH_PAYROLL_ABI } from "@/abi";
+import { ERC20_ABI, FREIGHT_ESCROW_ABI, TREASURY_ABI, SETTLEMENT_ABI } from "@/abi";
 
 // ============ Token Hooks ============
 
@@ -290,46 +290,4 @@ export function useSettleUsdcToEurc() {
   return { settle, hash, isPending, isConfirming, isSuccess, error };
 }
 
-// ============ Payroll Hooks ============
 
-export function useBatchCount() {
-  return useReadContract({
-    address: CONTRACTS.batchPayroll,
-    abi: BATCH_PAYROLL_ABI,
-    functionName: "getBatchCount",
-  });
-}
-
-export function useTotalPaidUsdc() {
-  return useReadContract({
-    address: CONTRACTS.batchPayroll,
-    abi: BATCH_PAYROLL_ABI,
-    functionName: "totalPaidUsdc",
-  });
-}
-
-export function useInitiatorBatches(address: `0x${string}` | undefined) {
-  return useReadContract({
-    address: CONTRACTS.batchPayroll,
-    abi: BATCH_PAYROLL_ABI,
-    functionName: "getInitiatorBatches",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address },
-  });
-}
-
-export function useBatchPayUsdc() {
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
-
-  const pay = (recipients: { wallet: `0x${string}`; amount: bigint; reference: string }[], batchRef: string) => {
-    writeContract({
-      address: CONTRACTS.batchPayroll,
-      abi: BATCH_PAYROLL_ABI,
-      functionName: "batchPayUsdc",
-      args: [recipients, batchRef],
-    });
-  };
-
-  return { pay, hash, isPending, isConfirming, isSuccess, error };
-}

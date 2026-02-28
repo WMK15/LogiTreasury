@@ -70,35 +70,9 @@ export interface SettlementRecord {
   reference: string;
 }
 
-// ============ Payroll Types ============
-
-export interface BatchRecord {
-  initiator: `0x${string}`;
-  token: `0x${string}`;
-  totalAmount: bigint;
-  recipientCount: bigint;
-  timestamp: bigint;
-  batchReference: string;
-  executed: boolean;
-}
-
-export interface PaymentRecord {
-  batchId: bigint;
-  recipient: `0x${string}`;
-  amount: bigint;
-  reference: string;
-  timestamp: bigint;
-}
-
-export interface Recipient {
-  wallet: `0x${string}`;
-  amount: string;
-  reference: string;
-}
-
 // ============ UI Types ============
 
-export type TabId = "overview" | "escrow" | "treasury" | "settlement" | "payroll";
+export type TabId = "overview" | "escrow" | "treasury" | "settlement" | "fiat";
 
 export interface NavItem {
   id: TabId;

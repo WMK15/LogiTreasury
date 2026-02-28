@@ -75,7 +75,6 @@ export const CONTRACTS = isLocal ? {
   treasury: (process.env.NEXT_PUBLIC_LOCAL_TREASURY_MANAGER_ADDRESS || "0x0") as `0x${string}`,
   freightEscrow: "0x0" as `0x${string}`,
   settlement: (process.env.NEXT_PUBLIC_LOCAL_SETTLEMENT_ROUTER_ADDRESS || "0x0") as `0x${string}`,
-  batchPayroll: "0x0" as `0x${string}`,
 } as const : {
   // Arc Testnet addresses
   usdc: (process.env.NEXT_PUBLIC_USDC_ADDRESS || "0x0") as `0x${string}`,
@@ -91,7 +90,6 @@ export const CONTRACTS = isLocal ? {
   treasury: (process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "0x0") as `0x${string}`,
   freightEscrow: (process.env.NEXT_PUBLIC_FREIGHT_ESCROW_ADDRESS || "0x0") as `0x${string}`,
   settlement: (process.env.NEXT_PUBLIC_SETTLEMENT_ADDRESS || "0x0") as `0x${string}`,
-  batchPayroll: (process.env.NEXT_PUBLIC_BATCH_PAYROLL_ADDRESS || "0x0") as `0x${string}`,
 } as const;
 
 /**
