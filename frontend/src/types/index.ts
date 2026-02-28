@@ -1,78 +1,107 @@
 /**
- * PayrollArena Type Definitions
+ * LogiTreasury Type Definitions
  */
 
-export enum PayrollType {
-  VESTING = 0,
-  MILESTONE = 1,
+// ============ Escrow Types ============
+
+export enum EscrowStatus {
+  CREATED = 0,
+  FUNDED = 1,
+  IN_TRANSIT = 2,
+  DELIVERED = 3,
+  RELEASED = 4,
+  DISPUTED = 5,
+  REFUNDED = 6,
 }
 
-export enum PayrollStatus {
-  ACTIVE = 0,
-  DISPUTED = 1,
-  COMPLETED = 2,
-  CANCELLED = 3,
-}
+export const EscrowStatusLabel: Record<EscrowStatus, string> = {
+  [EscrowStatus.CREATED]: "Created",
+  [EscrowStatus.FUNDED]: "Funded",
+  [EscrowStatus.IN_TRANSIT]: "In Transit",
+  [EscrowStatus.DELIVERED]: "Delivered",
+  [EscrowStatus.RELEASED]: "Released",
+  [EscrowStatus.DISPUTED]: "Disputed",
+  [EscrowStatus.REFUNDED]: "Refunded",
+};
 
-export interface Milestone {
-  description: string;
+export interface Shipment {
+  shipper: `0x${string}`;
+  carrier: `0x${string}`;
   amount: bigint;
-  completed: boolean;
-  approved: boolean;
+  usycShares: bigint;
+  yieldAccrued: bigint;
+  shipmentId: string;
+  origin: string;
+  destination: string;
+  createdAt: bigint;
+  fundedAt: bigint;
+  deliveredAt: bigint;
+  releasedAt: bigint;
+  status: EscrowStatus;
+  disputeDeadline: bigint;
+  disputeReason: string;
 }
 
-export interface PayrollEntry {
-  employer: `0x${string}`;
-  employee: `0x${string}`;
-  totalAmount: bigint;
-  claimedAmount: bigint;
-  startTime: bigint;
-  endTime: bigint;
-  disputeWindow: bigint;
-  payrollType: PayrollType;
-  status: PayrollStatus;
-  vestingCliff: bigint;
-  lastClaimTime: bigint;
-}
-
-export interface PayrollWithId extends PayrollEntry {
+export interface ShipmentWithId extends Shipment {
   id: bigint;
-  milestones?: Milestone[];
-  claimableAmount?: bigint;
+  currentYield?: bigint;
 }
 
-export interface CreateVestingPayrollParams {
-  employee: `0x${string}`;
+// ============ Treasury Types ============
+
+export interface TreasuryStats {
+  totalDeposited: bigint;
+  totalWithdrawn: bigint;
+  totalYieldEarned: bigint;
+  activeEscrowCount: bigint;
+  activeEscrowValue: bigint;
+}
+
+// ============ Settlement Types ============
+
+export interface SettlementRecord {
+  initiator: `0x${string}`;
+  sourceToken: `0x${string}`;
+  targetToken: `0x${string}`;
+  sourceAmount: bigint;
+  targetAmount: bigint;
+  rate: bigint;
+  timestamp: bigint;
+  reference: string;
+}
+
+// ============ Payroll Types ============
+
+export interface BatchRecord {
+  initiator: `0x${string}`;
+  token: `0x${string}`;
   totalAmount: bigint;
-  startTime: bigint;
-  endTime: bigint;
-  cliffDuration: bigint;
-  disputeWindow: bigint;
+  recipientCount: bigint;
+  timestamp: bigint;
+  batchReference: string;
+  executed: boolean;
 }
 
-export interface CreateMilestonePayrollParams {
-  employee: `0x${string}`;
-  totalAmount: bigint;
-  descriptions: string[];
-  amounts: bigint[];
-  disputeWindow: bigint;
+export interface PaymentRecord {
+  batchId: bigint;
+  recipient: `0x${string}`;
+  amount: bigint;
+  reference: string;
+  timestamp: bigint;
 }
 
-// UI Form Types
-export interface VestingFormData {
-  employeeAddress: string;
+export interface Recipient {
+  wallet: `0x${string}`;
   amount: string;
-  startDate: string;
-  endDate: string;
-  cliffDays: number;
-  disputeWindowDays: number;
+  reference: string;
 }
 
-export interface MilestoneFormData {
-  employeeAddress: string;
-  milestones: {
-    description: string;
-    amount: string;
-  }[];
-  disputeWindowDays: number;
+// ============ UI Types ============
+
+export type TabId = "overview" | "escrow" | "treasury" | "settlement" | "payroll";
+
+export interface NavItem {
+  id: TabId;
+  label: string;
+  href: string;
 }

@@ -1,135 +1,58 @@
-# PayrollArena
+# LogiTreasury
 
-> Programmable Payroll & Conditional USDC Escrow System
+European logistics treasury and settlement platform built on Arc Testnet.
 
-A decentralized payroll management platform built for EVM-compatible chains, featuring vesting schedules, milestone-based releases, and built-in dispute resolution.
+## Features
 
-## Overview
+- **Freight Escrow** - High-value shipment escrow with USYC yield accrual
+- **Treasury Management** - USDC deposits with auto-allocation to yield (USYC)
+- **Euro Settlement** - USDC <-> EURC conversion via StableFX
+- **Batch Payroll** - Multi-recipient payments in USDC/EURC
 
-PayrollArena enables employers to:
-- Deposit USDC into a smart contract treasury
-- Create payroll schedules with vesting or milestone-based releases
-- Monitor and manage employee payments
-- Raise disputes to freeze funds when needed
+## Tech Stack
 
-Employees can:
-- Track vesting progress and milestone status
-- Claim unlocked funds automatically
-- Mark milestones as complete for approval
+- **Smart Contracts**: Solidity 0.8.20, Hardhat
+- **Frontend**: Next.js 14 (App Router), TypeScript, TailwindCSS
+- **Web3**: Wagmi v2, Viem, RainbowKit
+- **Network**: Arc Testnet (Chain ID: 5042002)
 
-## Architecture
+## Prerequisites
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         FRONTEND                                │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────┐  │
-│  │  Employer Panel  │  │  Employee Panel  │  │   Treasury   │  │
-│  │  - Deposit USDC  │  │  - View Payrolls │  │   Overview   │  │
-│  │  - Create Payroll│  │  - Claim Funds   │  │              │  │
-│  │  - Approve MS    │  │  - Mark Complete │  │              │  │
-│  │  - Raise Dispute │  │                  │  │              │  │
-│  └────────┬─────────┘  └────────┬─────────┘  └──────┬───────┘  │
-│           │                     │                    │          │
-│  ┌────────┴─────────────────────┴────────────────────┴───────┐  │
-│  │                    Wagmi + Viem Hooks                     │  │
-│  └────────────────────────────┬──────────────────────────────┘  │
-└───────────────────────────────┼─────────────────────────────────┘
-                                │
-                    ┌───────────┴───────────┐
-                    │     RainbowKit        │
-                    │   Wallet Connection   │
-                    └───────────┬───────────┘
-                                │
-┌───────────────────────────────┼─────────────────────────────────┐
-│                         BLOCKCHAIN                              │
-│  ┌────────────────────────────┴──────────────────────────────┐  │
-│  │                    PayrollArena.sol                       │  │
-│  │  ┌─────────────────┐  ┌─────────────────┐  ┌───────────┐  │  │
-│  │  │  Vesting Logic  │  │ Milestone Logic │  │  Disputes │  │  │
-│  │  │  - Linear vest  │  │  - Mark done    │  │  - Freeze │  │  │
-│  │  │  - Cliff period │  │  - Approve      │  │  - Resolve│  │  │
-│  │  │  - Auto-unlock  │  │  - Release      │  │           │  │  │
-│  │  └─────────────────┘  └─────────────────┘  └───────────┘  │  │
-│  │                              │                             │  │
-│  │  ┌───────────────────────────┴───────────────────────────┐│  │
-│  │  │                 Employer Treasury                     ││  │
-│  │  │           mapping(address => uint256)                 ││  │
-│  │  └───────────────────────────┬───────────────────────────┘│  │
-│  └──────────────────────────────┼────────────────────────────┘  │
-│                                 │                               │
-│  ┌──────────────────────────────┴────────────────────────────┐  │
-│  │                        USDC (ERC20)                       │  │
-│  └───────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-```
+- Node.js 18+
+- npm or yarn
+- MetaMask wallet
+- Arc Testnet USDC (from faucet)
 
 ## Project Structure
 
 ```
 PayrollArena/
-├── contracts/                    # Smart contracts (Hardhat)
-│   ├── src/
-│   │   ├── PayrollArena.sol     # Main contract
-│   │   └── MockUSDC.sol         # Test token
-│   ├── interfaces/
-│   │   ├── IERC20.sol           # ERC20 interface
-│   │   └── IPayrollArena.sol    # Contract interface
-│   ├── scripts/
-│   │   └── deploy.ts            # Deployment script
-│   ├── test/
-│   │   └── PayrollArena.test.ts # Contract tests
-│   ├── hardhat.config.ts
-│   └── package.json
+├── contracts/           # Smart contracts (Hardhat)
+│   ├── src/            # Solidity source files
+│   ├── interfaces/     # Contract interfaces
+│   ├── scripts/        # Deployment scripts
+│   └── test/           # Contract tests
 │
-├── frontend/                     # Next.js 14 App
+├── frontend/           # Next.js frontend
 │   ├── src/
-│   │   ├── app/                 # App Router pages
-│   │   │   ├── employer/        # Employer dashboard
-│   │   │   ├── employee/        # Employee dashboard
-│   │   │   └── treasury/        # Treasury overview
-│   │   ├── components/
-│   │   │   ├── ui/              # UI components
-│   │   │   ├── payroll/         # Payroll components
-│   │   │   └── wallet/          # Wallet components
-│   │   ├── hooks/               # Wagmi hooks
-│   │   ├── lib/                 # Config & utils
-│   │   ├── types/               # TypeScript types
-│   │   └── abi/                 # Contract ABIs
-│   ├── package.json
-│   └── tailwind.config.ts
+│   │   ├── app/       # App Router pages
+│   │   ├── components/# React components
+│   │   ├── hooks/     # Wagmi hooks
+│   │   ├── abi/       # Contract ABIs
+│   │   └── lib/       # Utilities & config
+│   └── public/
 │
 └── README.md
 ```
 
-## Features
+## Setup
 
-### Vesting Payroll
-- Linear vesting over a configurable period
-- Cliff period before any tokens unlock
-- Automatic calculation of claimable amounts
-- Real-time progress tracking
-
-### Milestone Payroll
-- Define up to 20 milestones per payroll
-- Employee marks milestones as complete
-- Employer approves completed milestones
-- Funds release upon approval
-
-### Dispute Resolution
-- Employer can freeze payroll at any time
-- Dispute resolution releases or returns funds
-- Protects both parties in case of conflicts
-
-## Quick Start
-
-### Prerequisites
-- Node.js 18+
-- pnpm/npm/yarn
-- MetaMask or compatible wallet
-
-### 1. Clone & Install
+### 1. Clone and Install
 
 ```bash
+git clone <repo-url>
+cd PayrollArena
+
 # Install contract dependencies
 cd contracts
 npm install
@@ -141,114 +64,155 @@ npm install
 
 ### 2. Configure Environment
 
-```bash
-# Contracts
-cp contracts/.env.example contracts/.env
-# Edit with your private key and RPC URL
+#### Contracts (`contracts/.env`)
 
-# Frontend
-cp frontend/.env.example frontend/.env.local
-# Edit with contract addresses after deployment
+```bash
+cp .env.example .env
 ```
 
-### 3. Deploy Contracts
+Edit `.env`:
+
+```env
+# Your wallet private key (DO NOT COMMIT)
+PRIVATE_KEY=your_private_key_here
+
+# Arc Testnet
+ARC_RPC_URL=https://rpc.testnet.arc.network
+ARC_CHAIN_ID=5042002
+```
+
+#### Frontend (`frontend/.env.local`)
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` after deploying contracts (addresses will be output by deploy script):
+
+```env
+# Mock Token Addresses
+NEXT_PUBLIC_USDC_ADDRESS=0x...
+NEXT_PUBLIC_EURC_ADDRESS=0x...
+NEXT_PUBLIC_USYC_ADDRESS=0x...
+NEXT_PUBLIC_STABLEFX_ADDRESS=0x...
+
+# Core Contract Addresses
+NEXT_PUBLIC_FREIGHT_ESCROW_ADDRESS=0x...
+NEXT_PUBLIC_TREASURY_ADDRESS=0x...
+NEXT_PUBLIC_SETTLEMENT_ADDRESS=0x...
+NEXT_PUBLIC_BATCH_PAYROLL_ADDRESS=0x...
+
+# Chain Configuration
+NEXT_PUBLIC_CHAIN_ID=5042002
+NEXT_PUBLIC_RPC_URL=https://rpc.testnet.arc.network
+NEXT_PUBLIC_EXPLORER_URL=https://testnet.arcscan.app
+
+# WalletConnect (get from https://cloud.walletconnect.com)
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
+```
+
+### 3. Add Arc Testnet to MetaMask
+
+| Field | Value |
+|-------|-------|
+| Network Name | Arc Testnet |
+| RPC URL | https://rpc.testnet.arc.network |
+| Chain ID | 5042002 |
+| Currency Symbol | USDC |
+| Block Explorer | https://testnet.arcscan.app |
+
+### 4. Get Testnet Tokens
+
+Visit the Arc Testnet faucet to get testnet USDC for gas and testing.
+
+## Deployment
+
+### Compile Contracts
 
 ```bash
 cd contracts
-
-# Local development
-npm run node           # Terminal 1: Start local node
-npm run deploy:local   # Terminal 2: Deploy
-
-# Arc Testnet
-npm run deploy:arc
+npm run compile
 ```
 
-### 4. Run Frontend
+### Deploy to Arc Testnet
+
+```bash
+npm run deploy
+# or
+npx hardhat run scripts/deploy.ts --network arcTestnet
+```
+
+The deploy script will:
+1. Deploy mock tokens (USDC, EURC, USYC, StableFX)
+2. Deploy core contracts (FreightEscrow, Treasury, Settlement, BatchPayroll)
+3. Mint test tokens to deployer
+4. Seed StableFX with liquidity
+5. Output addresses to add to frontend `.env.local`
+
+### Seed Additional Test Data
+
+```bash
+npx hardhat run scripts/seed.ts --network arcTestnet
+```
+
+## Running the Frontend
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-Open http://localhost:3000
+Open http://localhost:3000 in your browser.
 
-## Smart Contract API
+## Deployed Contracts (Arc Testnet)
 
-### Employer Functions
+| Contract | Address |
+|----------|---------|
+| MockUSDC | `0x5D2EF4689bd78E78aC6f25cBAb601B74a16597cB` |
+| MockEURC | `0x889dbe4EdD1A8b83BB34dD10CBc0e30725490dC9` |
+| MockUSYC | `0xfE7E6B7C10C59796Ed887774f83d80aa3865366D` |
+| MockStableFX | `0x1743B520179E2dbAabBC8587661CC5b7bE42f7c4` |
+| FreightEscrow | `0xf51eA88Ce8762021f8516393C4016d131d6FA085` |
+| Treasury | `0xDD7bB606DE0ABD7AEF79A5b3e257bf09fEcF6A48` |
+| Settlement | `0x8500aE3e1303a42110592AE268E4f1BDfed37a85` |
+| BatchPayroll | `0x5CcD00fD13dF4E3121ee1f4Ccd76253966b9fb86` |
 
-| Function | Description |
-|----------|-------------|
-| `deposit(amount)` | Deposit USDC to treasury |
-| `withdraw(amount)` | Withdraw unused funds |
-| `createVestingPayroll(...)` | Create vesting schedule |
-| `createMilestonePayroll(...)` | Create milestone-based payroll |
-| `approveMilestone(id, index)` | Approve completed milestone |
-| `raiseDispute(id)` | Freeze payroll funds |
-| `resolveDispute(id, toEmployee)` | Resolve dispute |
-| `cancelPayroll(id)` | Cancel before any claims |
+## Contract Overview
 
-### Employee Functions
+### FreightEscrow
+High-value shipment escrow with yield generation. Deposited USDC is converted to USYC to earn yield while in escrow.
 
-| Function | Description |
-|----------|-------------|
-| `claimVestedFunds(id)` | Claim unlocked vesting funds |
-| `markMilestoneComplete(id, index)` | Mark milestone done |
-| `claimMilestoneFunds(id)` | Claim approved milestones |
+### Treasury
+Corporate treasury management. Deposit USDC, auto-allocate to yield-bearing USYC, withdraw anytime.
 
-### View Functions
+### Settlement
+FX settlement between USDC and EURC using StableFX mock (simulates Circle's real StableFX API).
 
-| Function | Description |
-|----------|-------------|
-| `getPayroll(id)` | Get payroll details |
-| `getMilestones(id)` | Get milestone array |
-| `getClaimableAmount(id)` | Get current claimable |
-| `employerBalance(address)` | Get treasury balance |
-| `getEmployerPayrolls(address)` | List employer's payrolls |
-| `getEmployeePayrolls(address)` | List employee's payrolls |
+### BatchPayroll
+Multi-recipient batch payments. Pay suppliers, drivers, or partners in bulk with USDC or EURC.
 
-## Testing
+## Development
+
+### Run Tests
 
 ```bash
 cd contracts
-npm run test
-npm run test:coverage
+npm test
 ```
 
-## Hackathon Notes
+### Lint
 
-### What's Implemented
-- Full vesting logic with cliff periods
-- Milestone-based payment flow
-- Dispute freeze mechanism
-- Complete frontend with dashboards
-- Wallet integration (RainbowKit)
+```bash
+cd frontend
+npm run lint
+```
 
-### Future Improvements
-- Multi-sig dispute resolution
-- Batch payroll creation
-- Recurring payments
-- Off-chain milestone verification (oracles)
-- Email/push notifications
-- CSV export of payment history
+## Notes
 
-### Security Considerations
-- Uses SafeTransfer pattern
-- Reentrancy protection via checks-effects-interactions
-- Input validation on all public functions
-- Events emitted for transparency
-
-## Tech Stack
-
-- **Smart Contracts**: Solidity 0.8.20, Hardhat
-- **Frontend**: Next.js 14, TypeScript, TailwindCSS
-- **Web3**: Wagmi v2, Viem, RainbowKit
-- **Target Chain**: Arc Testnet (EVM-compatible)
+- Arc Testnet uses USDC as the native gas token (18 decimals for gas)
+- Mock tokens are used since Circle's real USYC/StableFX require whitelisting
+- `reference` is a reserved keyword in Solidity 0.8.20 - use `memo` instead
 
 ## License
 
 MIT
-
----
-
-Built for hackathon demonstration purposes. Not audited for production use.

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { Navigation } from "@/components/ui/Navigation";
+import { Sidebar } from "@/components/ui/Sidebar";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "PayrollArena",
-  description: "Programmable payroll and USDC escrow",
+  title: "LogiTreasury",
+  description: "European logistics treasury and settlement platform",
 };
 
 export default function RootLayout({
@@ -24,10 +24,14 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="bg-neutral-950 text-neutral-100 min-h-screen font-sans">
         <Providers>
-          <Navigation />
-          <main className="max-w-5xl mx-auto px-6 py-6">
-            {children}
-          </main>
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <main className="flex-1 ml-56">
+              <div className="max-w-6xl mx-auto px-6 py-6">
+                {children}
+              </div>
+            </main>
+          </div>
         </Providers>
       </body>
     </html>

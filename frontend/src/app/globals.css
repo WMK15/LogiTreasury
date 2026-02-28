@@ -14,6 +14,7 @@
 }
 
 @layer components {
+  /* Buttons */
   .btn {
     @apply inline-flex items-center justify-center text-sm font-medium h-8 px-3 rounded-md transition-all duration-150 ease-out disabled:opacity-40 disabled:cursor-not-allowed;
   }
@@ -34,42 +35,30 @@
     @apply btn bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20;
   }
 
+  /* Cards */
   .card {
-    @apply bg-neutral-900 border border-neutral-800 rounded-md p-5;
+    @apply bg-neutral-900 border border-neutral-800 rounded-md p-4;
   }
 
+  /* Inputs */
   .input {
     @apply w-full h-9 bg-neutral-900 border border-neutral-800 rounded-md px-3 text-sm text-neutral-100 placeholder-neutral-500 transition-colors duration-150 focus:outline-none focus:border-neutral-600 focus:ring-1 focus:ring-neutral-600;
   }
 
   .label {
-    @apply block text-xs font-medium text-neutral-400 mb-1.5 uppercase tracking-wide;
+    @apply block text-xs font-medium text-neutral-500 mb-1.5 uppercase tracking-wide;
   }
 
-  .status-active {
-    @apply text-emerald-400 text-xs font-medium;
-  }
-
-  .status-disputed {
-    @apply text-amber-400 text-xs font-medium;
-  }
-
-  .status-completed {
-    @apply text-neutral-400 text-xs font-medium;
-  }
-
-  .status-cancelled {
-    @apply text-neutral-500 text-xs font-medium;
-  }
-
+  /* KPI Display */
   .kpi-value {
-    @apply text-lg font-medium text-neutral-100 tabular-nums;
+    @apply text-lg font-medium text-neutral-200 tabular-nums leading-tight;
   }
 
   .kpi-label {
     @apply text-xs text-neutral-500 uppercase tracking-wide;
   }
 
+  /* Tabs */
   .tab {
     @apply text-sm font-medium px-3 py-1.5 rounded-md transition-colors duration-150;
   }
@@ -82,11 +71,34 @@
     @apply tab text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50;
   }
 
+  /* Status */
+  .status-active {
+    @apply text-emerald-400 text-xs font-medium;
+  }
+
+  .status-pending {
+    @apply text-amber-400 text-xs font-medium;
+  }
+
+  .status-completed {
+    @apply text-neutral-400 text-xs font-medium;
+  }
+
+  /* Utilities */
   .row-hover {
     @apply transition-colors duration-150 hover:bg-neutral-800/40;
   }
 
   .skeleton {
     @apply bg-neutral-800 animate-pulse rounded;
+  }
+
+  /* Table */
+  .table-row {
+    @apply border-b border-neutral-800/50 last:border-0;
+  }
+
+  .table-cell {
+    @apply py-3 px-2 text-sm;
   }
 }
