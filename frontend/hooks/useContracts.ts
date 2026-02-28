@@ -42,6 +42,7 @@ export function useEURCBalance(address: `0x${string}` | undefined) {
 
 /**
  * USYC balance (Real Hashnote USYC on Arc Testnet)
+ * Contract: 0x9fdF14c5B14173D74C08Af27AebFf39240dC105A
  */
 export function useUSYCBalance(address: `0x${string}` | undefined) {
   return useReadContract({
@@ -49,7 +50,10 @@ export function useUSYCBalance(address: `0x${string}` | undefined) {
     abi: ERC20_ABI,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    query: { enabled: !!address },
+    query: { 
+      enabled: !!address && CONTRACTS.usyc !== "0x0",
+      refetchInterval: 10000, // Refresh every 10s
+    },
   });
 }
 

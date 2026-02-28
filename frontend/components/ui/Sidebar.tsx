@@ -5,11 +5,9 @@ import { usePathname } from "next/navigation";
 import { ConnectWallet } from "@/components/ui/ConnectWallet";
 
 const navItems = [
-  { href: "/", label: "Overview", icon: "◉" },
-  { href: "/escrow", label: "Freight Escrow", icon: "◈" },
-  { href: "/treasury", label: "Treasury", icon: "◇" },
-  { href: "/settlement", label: "FX Settlement", icon: "⬡" },
-  { href: "/fiat", label: "Fiat (CPN)", icon: "€" },
+  { href: "/", label: "Dashboard", icon: "◉" },
+  { href: "/analytics", label: "Analytics", icon: "◇" },
+  { href: "/settlements", label: "Settlements", icon: "◈" },
 ];
 
 export function Sidebar() {
