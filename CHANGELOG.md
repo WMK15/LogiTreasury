@@ -4,6 +4,60 @@ All notable changes to the ArcLogistics Treasury project are documented here.
 
 ---
 
+## [0.4.1] - 2026-02-28
+
+### Fixed
+- **TypeScript build errors**:
+  - Fixed duplicate `swap` property in `useFX.ts` return object (destructured to avoid collision)
+  - Fixed enum imports in service files - `DepositStatus`, `WithdrawalStatus`, `SwapDirection`, `SettlementStatus` now imported as values (not `import type`) since they're used as runtime values
+  - `tsconfig.json` target set to `ES2020` for BigInt literal support
+
+---
+
+## [0.4.0] - 2026-02-28
+
+### Added
+- **shadcn/ui integration** - Proper component library setup:
+  - `components.json` configuration file
+  - CSS variables for theming in `globals.css`
+  - Core components: Button, Card, Input, Label, Badge, Dialog, Tabs, DropdownMenu, Skeleton, Tooltip
+  - Radix UI primitives as foundation
+
+- **StableFX API support** - Server-side API key configuration:
+  - `STABLEFX_API_KEY` environment variable
+  - `STABLEFX_API_URL` endpoint configuration
+  - `CIRCLE_API_KEY` for CPN integration
+
+### Changed
+- **Frontend restructure** - Moved from `src/` to root-level folders:
+  - `src/app/` → `app/`
+  - `src/components/` → `components/`
+  - `src/hooks/` → `hooks/`
+  - `src/lib/` → `lib/`
+  - `src/abi/` → `abi/`
+  - `src/types/` → `types/`
+
+- **Config updates**:
+  - `tsconfig.json` - Updated `@/*` alias from `./src/*` to `./*`
+  - `tailwind.config.ts` - Removed `./src/` prefix from content paths
+  - `tailwind.config.ts` - Added shadcn CSS variable colors and animations
+
+- **Dependencies**:
+  - Added `class-variance-authority` for component variants
+  - Added `@radix-ui/*` packages for primitives
+  - Added `lucide-react` for icons
+  - Added `tailwindcss-animate` for animations
+
+- **Environment files**:
+  - Updated `.env.example` with full configuration template
+  - Added API key placeholders for StableFX and Circle
+
+### Removed
+- **RainbowKit** - Fully removed (was already not in use)
+- **`src/` folder** - Flattened to root structure
+
+---
+
 ## [0.3.0] - 2026-02-28
 
 ### Added
@@ -145,6 +199,7 @@ All notable changes to the ArcLogistics Treasury project are documented here.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.4.0 | 2026-02-28 | shadcn/ui setup, folder restructure, StableFX API support |
 | 0.3.0 | 2026-02-28 | Treasury suite (5 new contracts), local deployment |
 | 0.2.0 | 2026-02-27 | Dashboard components, services, hooks, APIs |
 | 0.1.0 | 2026-02-26 | Initial setup, core contracts, Arc Testnet deployment |

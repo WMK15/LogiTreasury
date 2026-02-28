@@ -22,13 +22,13 @@ PayrollArena/
 │   ├── scripts/                 # Deployment scripts
 │   └── test/                    # Contract tests
 ├── frontend/                    # Next.js 14 frontend
-│   ├── src/
-│   │   ├── app/                 # App router pages
-│   │   ├── components/          # React components
-│   │   ├── hooks/               # Custom hooks
-│   │   ├── lib/                 # Utilities & config
-│   │   ├── abi/                 # Contract ABIs
-│   │   └── types/               # TypeScript types
+│   ├── app/                     # App router pages
+│   ├── components/              # React components (shadcn/ui)
+│   ├── hooks/                   # Custom hooks
+│   ├── lib/                     # Utilities & config
+│   ├── abi/                     # Contract ABIs
+│   ├── types/                   # TypeScript types
+│   ├── components.json          # shadcn/ui config
 │   └── public/                  # Static assets
 ├── CURRENT.md                   # This file
 ├── CHANGELOG.md                 # Version history

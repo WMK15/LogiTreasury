@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer components {
+  /* Legacy button classes - prefer shadcn Button component */
+  .btn {
+    @apply inline-flex items-center justify-center text-sm font-medium h-8 px-3 rounded-md transition-all duration-150 ease-out disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .btn-danger {
+    @apply btn bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/20;
+  }
+
+  /* Legacy card class - will be replaced by shadcn Card */
+  .card {
+    @apply bg-card border border-border rounded-md p-4;
+  }
+
+  /* Legacy input - will be replaced by shadcn Input */
+  .input {
+    @apply w-full h-9 bg-background border border-input rounded-md px-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-150 focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring;
+  }
+
+  .label {
+    @apply block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide;
+  }
+
+  /* KPI Display */
+  .kpi-value {
+    @apply text-lg font-medium text-foreground tabular-nums leading-tight;
+  }
+
+  .kpi-label {
+    @apply text-xs text-muted-foreground uppercase tracking-wide;
+  }
+
+  /* Tabs - prefer shadcn Tabs component */
+  .tab {
+    @apply text-sm font-medium px-3 py-1.5 rounded-md transition-colors duration-150;
+  }
+
+  .tab-active {
+    @apply tab bg-secondary text-secondary-foreground;
+  }
+
+  .tab-inactive {
+    @apply tab text-muted-foreground hover:text-foreground hover:bg-secondary/50;
+  }
+
+  /* Status badges */
+  .status-active {
+    @apply text-emerald-400 text-xs font-medium;
+  }
+
+  .status-pending {
+    @apply text-amber-400 text-xs font-medium;
+  }
+
+  .status-completed {
+    @apply text-muted-foreground text-xs font-medium;
+  }
+
+  /* Utilities */
+  .row-hover {
+    @apply transition-colors duration-150 hover:bg-accent/40;
+  }
+
+  .skeleton {
+    @apply bg-muted animate-pulse rounded;
+  }
+
+  /* Table */
+  .table-row {
+    @apply border-b border-border/50 last:border-0;
+  }
+
+  .table-cell {
+    @apply py-3 px-2 text-sm;
+  }
+}

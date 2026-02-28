@@ -10,7 +10,7 @@
 
 ### Key Technologies
 - **Smart Contracts**: Solidity 0.8.20, Hardhat, ethers.js v6
-- **Frontend**: Next.js 14 (App Router), TypeScript, TailwindCSS, Wagmi v2, Viem, RainbowKit
+- **Frontend**: Next.js 14 (App Router), TypeScript, TailwindCSS, shadcn/ui, Wagmi v2, Viem
 - **Chains**: Arc Testnet (5042002), Hardhat Local (31337)
 
 ---
