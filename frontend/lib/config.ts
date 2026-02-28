@@ -81,15 +81,15 @@ export const CONTRACTS = isLocal ? {
   eurc: (process.env.NEXT_PUBLIC_EURC_ADDRESS || "0x0") as `0x${string}`,
   usyc: (process.env.NEXT_PUBLIC_USYC_ADDRESS || "0x0") as `0x${string}`,
   stableFx: (process.env.NEXT_PUBLIC_STABLEFX_ADDRESS || "0x0") as `0x${string}`,
-  treasuryManager: (process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "0x0") as `0x${string}`,
-  yieldVaultAdapter: "0x0" as `0x${string}`,
-  fxEngine: "0x0" as `0x${string}`,
-  settlementRouter: (process.env.NEXT_PUBLIC_SETTLEMENT_ADDRESS || "0x0") as `0x${string}`,
-  cpnGateway: "0x0" as `0x${string}`,
+  treasuryManager: (process.env.NEXT_PUBLIC_TREASURY_MANAGER_ADDRESS || "0x0") as `0x${string}`,
+  yieldVaultAdapter: (process.env.NEXT_PUBLIC_YIELD_VAULT_ADAPTER_ADDRESS || "0x0") as `0x${string}`,
+  fxEngine: (process.env.NEXT_PUBLIC_FX_ENGINE_ADDRESS || "0x0") as `0x${string}`,
+  settlementRouter: (process.env.NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS || "0x0") as `0x${string}`,
+  cpnGateway: (process.env.NEXT_PUBLIC_CPN_GATEWAY_ADDRESS || "0x0") as `0x${string}`,
   // Legacy addresses
-  treasury: (process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "0x0") as `0x${string}`,
+  treasury: (process.env.NEXT_PUBLIC_TREASURY_MANAGER_ADDRESS || "0x0") as `0x${string}`,
   freightEscrow: (process.env.NEXT_PUBLIC_FREIGHT_ESCROW_ADDRESS || "0x0") as `0x${string}`,
-  settlement: (process.env.NEXT_PUBLIC_SETTLEMENT_ADDRESS || "0x0") as `0x${string}`,
+  settlement: (process.env.NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS || "0x0") as `0x${string}`,
 } as const;
 
 /**

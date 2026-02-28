@@ -368,6 +368,52 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Wallet Balances */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="card">
+          <p className="kpi-label mb-1">Native USDC (Gas)</p>
+          {nativeLoading ? (
+            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {nativeBalance
+                ? Number(nativeBalance.formatted).toFixed(2)
+                : "0.00"}
+            </p>
+          )}
+        </div>
+        <div className="card">
+          <p className="kpi-label mb-1">ERC20 USDC</p>
+          {usdcLoading ? (
+            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {usdcBalance ? formatUSDC(usdcBalance) : "0.00"}
+            </p>
+          )}
+        </div>
+        <div className="card">
+          <p className="kpi-label mb-1">Wallet EURC</p>
+          {eurcLoading ? (
+            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {eurcBalance ? formatUSDC(eurcBalance) : "0.00"}
+            </p>
+          )}
+        </div>
+        <div className="card">
+          <p className="kpi-label mb-1">USYC Holdings</p>
+          {usycLoading ? (
+            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value text-emerald-400">
+              {formatUSDC((usycBalance as bigint) || 0n)}
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* ═══════════════════════════════════════════════════════ */}
       {/* 4. YIELD EARNED HIGHLIGHT                              */}
       {/* ═══════════════════════════════════════════════════════ */}
