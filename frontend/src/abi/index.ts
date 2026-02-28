@@ -1,6 +1,13 @@
 /**
- * Contract ABIs - Minimal for frontend interactions
+ * Contract ABIs - ArcLogistics Treasury
  */
+
+// New enterprise contracts
+export { treasuryManagerAbi } from './TreasuryManager';
+export { yieldVaultAdapterAbi } from './YieldVaultAdapter';
+export { fxExecutionEngineAbi } from './FXExecutionEngine';
+export { settlementRouterAbi } from './SettlementRouter';
+export { cpnGatewayAbi } from './CPNGateway';
 
 export const ERC20_ABI = [
   {

@@ -3,6 +3,31 @@ import { defineChain } from "viem";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 
 /**
+ * Network Mode - 'local' for Hardhat, 'testnet' for Arc Testnet
+ */
+const NETWORK_MODE = process.env.NEXT_PUBLIC_NETWORK_MODE || "local";
+const isLocal = NETWORK_MODE === "local";
+
+/**
+ * Local Hardhat Chain Definition
+ */
+export const localHardhat = defineChain({
+  id: 31337,
+  name: "Hardhat Local",
+  nativeCurrency: {
+    decimals: 18,
+    name: "ETH",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: {
+      http: [process.env.NEXT_PUBLIC_LOCAL_RPC_URL || "http://127.0.0.1:8545"],
+    },
+  },
+  testnet: true,
+});
+
+/**
  * Arc Testnet Chain Definition
  */
 export const arcTestnet = defineChain({
@@ -28,15 +53,43 @@ export const arcTestnet = defineChain({
 });
 
 /**
- * Contract Addresses
+ * Active chain based on network mode
  */
-export const CONTRACTS = {
+export const activeChain = isLocal ? localHardhat : arcTestnet;
+
+/**
+ * Contract Addresses - switches based on network mode
+ */
+export const CONTRACTS = isLocal ? {
+  // Local Hardhat addresses
+  usdc: (process.env.NEXT_PUBLIC_LOCAL_USDC_ADDRESS || "0x0") as `0x${string}`,
+  eurc: (process.env.NEXT_PUBLIC_LOCAL_EURC_ADDRESS || "0x0") as `0x${string}`,
+  usyc: (process.env.NEXT_PUBLIC_LOCAL_USYC_ADDRESS || "0x0") as `0x${string}`,
+  stableFx: (process.env.NEXT_PUBLIC_LOCAL_STABLEFX_ADDRESS || "0x0") as `0x${string}`,
+  treasuryManager: (process.env.NEXT_PUBLIC_LOCAL_TREASURY_MANAGER_ADDRESS || "0x0") as `0x${string}`,
+  yieldVaultAdapter: (process.env.NEXT_PUBLIC_LOCAL_YIELD_VAULT_ADAPTER_ADDRESS || "0x0") as `0x${string}`,
+  fxEngine: (process.env.NEXT_PUBLIC_LOCAL_FX_ENGINE_ADDRESS || "0x0") as `0x${string}`,
+  settlementRouter: (process.env.NEXT_PUBLIC_LOCAL_SETTLEMENT_ROUTER_ADDRESS || "0x0") as `0x${string}`,
+  cpnGateway: (process.env.NEXT_PUBLIC_LOCAL_CPN_GATEWAY_ADDRESS || "0x0") as `0x${string}`,
+  // Legacy addresses (keep for backwards compat)
+  treasury: (process.env.NEXT_PUBLIC_LOCAL_TREASURY_MANAGER_ADDRESS || "0x0") as `0x${string}`,
+  freightEscrow: "0x0" as `0x${string}`,
+  settlement: (process.env.NEXT_PUBLIC_LOCAL_SETTLEMENT_ROUTER_ADDRESS || "0x0") as `0x${string}`,
+  batchPayroll: "0x0" as `0x${string}`,
+} as const : {
+  // Arc Testnet addresses
   usdc: (process.env.NEXT_PUBLIC_USDC_ADDRESS || "0x0") as `0x${string}`,
   eurc: (process.env.NEXT_PUBLIC_EURC_ADDRESS || "0x0") as `0x${string}`,
   usyc: (process.env.NEXT_PUBLIC_USYC_ADDRESS || "0x0") as `0x${string}`,
   stableFx: (process.env.NEXT_PUBLIC_STABLEFX_ADDRESS || "0x0") as `0x${string}`,
-  freightEscrow: (process.env.NEXT_PUBLIC_FREIGHT_ESCROW_ADDRESS || "0x0") as `0x${string}`,
+  treasuryManager: (process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "0x0") as `0x${string}`,
+  yieldVaultAdapter: "0x0" as `0x${string}`,
+  fxEngine: "0x0" as `0x${string}`,
+  settlementRouter: (process.env.NEXT_PUBLIC_SETTLEMENT_ADDRESS || "0x0") as `0x${string}`,
+  cpnGateway: "0x0" as `0x${string}`,
+  // Legacy addresses
   treasury: (process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "0x0") as `0x${string}`,
+  freightEscrow: (process.env.NEXT_PUBLIC_FREIGHT_ESCROW_ADDRESS || "0x0") as `0x${string}`,
   settlement: (process.env.NEXT_PUBLIC_SETTLEMENT_ADDRESS || "0x0") as `0x${string}`,
   batchPayroll: (process.env.NEXT_PUBLIC_BATCH_PAYROLL_ADDRESS || "0x0") as `0x${string}`,
 } as const;
@@ -47,9 +100,9 @@ export const CONTRACTS = {
 export const config = getDefaultConfig({
   appName: "LogiTreasury",
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "demo",
-  chains: [arcTestnet],
+  chains: [activeChain],
   transports: {
-    [arcTestnet.id]: http(),
+    [activeChain.id]: http(),
   },
   ssr: true,
 });
@@ -87,3 +140,13 @@ export function formatPercent(bps: number): string {
 export function shortenAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
+
+/**
+ * Network info
+ */
+export const NETWORK_INFO = {
+  mode: NETWORK_MODE,
+  isLocal,
+  chainId: activeChain.id,
+  chainName: activeChain.name,
+};

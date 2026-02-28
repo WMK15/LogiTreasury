@@ -1,57 +1,178 @@
-# LogiTreasury
+# ArcLogistics Treasury
 
-European logistics treasury and settlement platform built on Arc Testnet.
+> **Unified Logistics Treasury & Payout Engine for European logistics companies**
+
+Enterprise-grade financial infrastructure built on Arc Network. Ensures no capital sits idle through automated yield optimization, instant FX conversion, cross-chain settlement, and seamless fiat integration.
+
+## Core Principle
+
+**No capital sits idle.** All funds are either:
+1. Earning yield via **USYC** (~4.5% APY)
+2. Converted optimally via **StableFX**
+3. Settled instantly across chains via **Arc Bridge Kit**
+4. Connected to traditional banking via **CPN**
+
+---
+
+## Track Alignment
+
+### Track 1: Global Payouts & Treasury
+- Circle Wallets
+- Circle Gateway (unified balance)
+- Arc Bridge Kit (cross-chain)
+- CPN (fiat rails)
+
+### Track 2: USYC & StableFX
+- USYC (yield layer)
+- StableFX (FX layer)
+
+---
 
 ## Features
 
-- **Freight Escrow** - High-value shipment escrow with USYC yield accrual
-- **Treasury Management** - USDC deposits with auto-allocation to yield (USYC)
-- **Euro Settlement** - USDC <-> EURC conversion via StableFX
-- **Batch Payroll** - Multi-recipient payments in USDC/EURC
+### Treasury Engine
+- Unified balance abstraction via Circle Gateway
+- Idle capital detection with auto-sweep to USYC
+- Multi-operator role-based access control
+- Liquidity availability tracking
+
+### Freight Escrow Module
+- Shipment-linked escrow contracts
+- Funds automatically held in USYC while in transit
+- Conditional release upon delivery confirmation
+- Human-in-the-loop override for disputes
+
+### FX Execution Layer
+- StableFX RFQ flow integration
+- Real-time USDC ↔ EURC conversion
+- Atomic PvP settlement logic
+- FX exposure monitoring dashboard
+
+### Multi-Chain Settlement Router
+- Arc Bridge Kit integration
+- Destination chain routing logic
+- Mass payout capability (batch settlements)
+- Transaction status tracking
+
+### Fiat Integration Layer
+- CPN funding flow (bank → USDC)
+- Fiat withdrawal flow (USDC → bank)
+- Bank account management
+- Treasury reconciliation
+
+---
 
 ## Tech Stack
 
-- **Smart Contracts**: Solidity 0.8.20, Hardhat
-- **Frontend**: Next.js 14 (App Router), TypeScript, TailwindCSS
-- **Web3**: Wagmi v2, Viem, RainbowKit
-- **Network**: Arc Testnet (Chain ID: 5042002)
+### Smart Contracts
+- **Solidity 0.8.20**
+- **Hardhat** for development
+- Modular architecture:
+  - `TreasuryManager.sol` - Central treasury orchestration
+  - `YieldVaultAdapter.sol` - USYC integration
+  - `FXExecutionEngine.sol` - StableFX RFQ
+  - `SettlementRouter.sol` - Arc Bridge Kit
+  - `CPNGateway.sol` - Fiat integration
+  - `FreightEscrow.sol` - Shipment escrows
 
-## Prerequisites
+### Frontend
+- **Next.js 14** (App Router)
+- **TypeScript**
+- **TailwindCSS**
+- **shadcn/ui** components
+- **Wagmi v2** + **Viem**
+- **RainbowKit** wallet connection
 
+### Network
+- **Arc Testnet** (Chain ID: 5042002)
+- Cross-chain support: Ethereum, Arbitrum, Polygon, Base
+
+---
+
+## Project Structure
+
+```
+ArcLogistics/
+├── contracts/                    # Smart contracts (Hardhat)
+│   ├── src/
+│   │   ├── core/
+│   │   │   └── TreasuryManager.sol      # Central treasury
+│   │   ├── adapters/
+│   │   │   └── YieldVaultAdapter.sol    # USYC wrapper
+│   │   ├── fx/
+│   │   │   └── FXExecutionEngine.sol    # StableFX RFQ
+│   │   ├── bridge/
+│   │   │   └── SettlementRouter.sol     # Arc Bridge Kit
+│   │   ├── fiat/
+│   │   │   └── CPNGateway.sol           # CPN integration
+│   │   ├── FreightEscrow.sol            # Shipment escrows
+│   │   ├── Treasury.sol                 # Legacy treasury
+│   │   ├── Settlement.sol               # FX settlement
+│   │   ├── BatchPayroll.sol             # Batch payments
+│   │   └── Mock*.sol                    # Test mocks
+│   ├── interfaces/
+│   ├── scripts/
+│   └── test/
+│
+├── frontend/                     # Next.js frontend
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── api/
+│   │   │   │   ├── treasury/           # Treasury APIs
+│   │   │   │   ├── fx/                 # FX APIs
+│   │   │   │   └── settlement/         # Settlement APIs
+│   │   │   ├── (dashboard)/            # Dashboard pages
+│   │   │   ├── treasury/
+│   │   │   ├── escrow/
+│   │   │   ├── settlement/
+│   │   │   └── fx/
+│   │   ├── components/
+│   │   │   ├── dashboard/              # Dashboard components
+│   │   │   │   ├── DashboardLayout.tsx
+│   │   │   │   ├── BalanceOverview.tsx
+│   │   │   │   ├── YieldCard.tsx
+│   │   │   │   ├── FXWidget.tsx
+│   │   │   │   └── ChainBalances.tsx
+│   │   │   ├── escrow/
+│   │   │   ├── treasury/
+│   │   │   └── ui/                     # shadcn/ui
+│   │   ├── hooks/
+│   │   │   ├── useTreasury.ts          # Treasury hooks
+│   │   │   ├── useFX.ts                # FX hooks
+│   │   │   ├── useSettlement.ts        # Settlement hooks
+│   │   │   └── index.ts
+│   │   ├── lib/
+│   │   │   ├── services/
+│   │   │   │   ├── treasury.service.ts
+│   │   │   │   ├── fx.service.ts
+│   │   │   │   ├── settlement.service.ts
+│   │   │   │   └── cpn.service.ts
+│   │   │   ├── config.ts
+│   │   │   └── wagmi.ts
+│   │   ├── types/
+│   │   │   └── treasury.ts             # TypeScript types
+│   │   └── abi/                        # Contract ABIs
+│   └── public/
+│
+├── ARCHITECTURE.md               # System architecture diagrams
+└── README.md
+```
+
+---
+
+## Setup
+
+### Prerequisites
 - Node.js 18+
 - npm or yarn
 - MetaMask wallet
 - Arc Testnet USDC (from faucet)
 
-## Project Structure
-
-```
-PayrollArena/
-├── contracts/           # Smart contracts (Hardhat)
-│   ├── src/            # Solidity source files
-│   ├── interfaces/     # Contract interfaces
-│   ├── scripts/        # Deployment scripts
-│   └── test/           # Contract tests
-│
-├── frontend/           # Next.js frontend
-│   ├── src/
-│   │   ├── app/       # App Router pages
-│   │   ├── components/# React components
-│   │   ├── hooks/     # Wagmi hooks
-│   │   ├── abi/       # Contract ABIs
-│   │   └── lib/       # Utilities & config
-│   └── public/
-│
-└── README.md
-```
-
-## Setup
-
 ### 1. Clone and Install
 
 ```bash
 git clone <repo-url>
-cd PayrollArena
+cd ArcLogistics
 
 # Install contract dependencies
 cd contracts
@@ -70,8 +191,6 @@ npm install
 cp .env.example .env
 ```
 
-Edit `.env`:
-
 ```env
 # Your wallet private key (DO NOT COMMIT)
 PRIVATE_KEY=your_private_key_here
@@ -87,19 +206,20 @@ ARC_CHAIN_ID=5042002
 cp .env.example .env.local
 ```
 
-Edit `.env.local` after deploying contracts (addresses will be output by deploy script):
-
 ```env
-# Mock Token Addresses
+# Token Addresses
 NEXT_PUBLIC_USDC_ADDRESS=0x...
 NEXT_PUBLIC_EURC_ADDRESS=0x...
 NEXT_PUBLIC_USYC_ADDRESS=0x...
 NEXT_PUBLIC_STABLEFX_ADDRESS=0x...
 
 # Core Contract Addresses
+NEXT_PUBLIC_TREASURY_MANAGER_ADDRESS=0x...
+NEXT_PUBLIC_YIELD_ADAPTER_ADDRESS=0x...
+NEXT_PUBLIC_FX_ENGINE_ADDRESS=0x...
+NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS=0x...
+NEXT_PUBLIC_CPN_GATEWAY_ADDRESS=0x...
 NEXT_PUBLIC_FREIGHT_ESCROW_ADDRESS=0x...
-NEXT_PUBLIC_TREASURY_ADDRESS=0x...
-NEXT_PUBLIC_SETTLEMENT_ADDRESS=0x...
 NEXT_PUBLIC_BATCH_PAYROLL_ADDRESS=0x...
 
 # Chain Configuration
@@ -107,7 +227,7 @@ NEXT_PUBLIC_CHAIN_ID=5042002
 NEXT_PUBLIC_RPC_URL=https://rpc.testnet.arc.network
 NEXT_PUBLIC_EXPLORER_URL=https://testnet.arcscan.app
 
-# WalletConnect (get from https://cloud.walletconnect.com)
+# WalletConnect
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
 ```
 
@@ -121,9 +241,7 @@ NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
 | Currency Symbol | USDC |
 | Block Explorer | https://testnet.arcscan.app |
 
-### 4. Get Testnet Tokens
-
-Visit the Arc Testnet faucet to get testnet USDC for gas and testing.
+---
 
 ## Deployment
 
@@ -144,16 +262,12 @@ npx hardhat run scripts/deploy.ts --network arcTestnet
 
 The deploy script will:
 1. Deploy mock tokens (USDC, EURC, USYC, StableFX)
-2. Deploy core contracts (FreightEscrow, Treasury, Settlement, BatchPayroll)
-3. Mint test tokens to deployer
-4. Seed StableFX with liquidity
-5. Output addresses to add to frontend `.env.local`
+2. Deploy core contracts
+3. Configure contract relationships
+4. Mint test tokens
+5. Output addresses for frontend config
 
-### Seed Additional Test Data
-
-```bash
-npx hardhat run scripts/seed.ts --network arcTestnet
-```
+---
 
 ## Running the Frontend
 
@@ -162,7 +276,53 @@ cd frontend
 npm run dev
 ```
 
-Open http://localhost:3000 in your browser.
+Open http://10.0.3.227:3000 (or your local IP) in your browser.
+
+For LAN access, the dev server binds to your local IP automatically.
+
+---
+
+## API Routes
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/treasury/balance` | GET | Get unified treasury balance |
+| `/api/treasury/yield` | GET | Get yield metrics |
+| `/api/fx/rates` | GET | Get current FX rates |
+| `/api/fx/quote` | POST | Request swap quote |
+| `/api/settlement/chains` | GET | Get supported chains |
+| `/api/settlement/route` | POST | Get settlement route |
+
+---
+
+## Integration Flows
+
+### USYC Yield Flow
+```
+Treasury → Idle Detection → YieldAdapter → USYC Vault → Yield Accrual
+                                    ↓
+                              (When needed)
+                                    ↓
+                    Redemption → USDC Liquidity
+```
+
+### StableFX RFQ Flow
+```
+Operator → Request Quote → Get Rate → Accept → Execute → Atomic PvP → Settlement
+```
+
+### Cross-Chain Settlement
+```
+Treasury → Router → Calculate Route → Arc Bridge → Destination Chain → Recipient
+```
+
+### CPN Fiat Flow
+```
+Bank (SEPA/Wire) → CPN → Mint USDC → Treasury
+Treasury → CPNGateway → Burn USDC → CPN → Bank (Wire)
+```
+
+---
 
 ## Deployed Contracts (Arc Testnet)
 
@@ -177,19 +337,7 @@ Open http://localhost:3000 in your browser.
 | Settlement | `0x8500aE3e1303a42110592AE268E4f1BDfed37a85` |
 | BatchPayroll | `0x5CcD00fD13dF4E3121ee1f4Ccd76253966b9fb86` |
 
-## Contract Overview
-
-### FreightEscrow
-High-value shipment escrow with yield generation. Deposited USDC is converted to USYC to earn yield while in escrow.
-
-### Treasury
-Corporate treasury management. Deposit USDC, auto-allocate to yield-bearing USYC, withdraw anytime.
-
-### Settlement
-FX settlement between USDC and EURC using StableFX mock (simulates Circle's real StableFX API).
-
-### BatchPayroll
-Multi-recipient batch payments. Pay suppliers, drivers, or partners in bulk with USDC or EURC.
+---
 
 ## Development
 
@@ -207,11 +355,49 @@ cd frontend
 npm run lint
 ```
 
+---
+
+## Architecture
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture diagrams including:
+- System overview
+- Data flow diagrams
+- Contract hierarchy
+- Integration flows
+
+---
+
+## Key Design Decisions
+
+1. **Modular Contract Architecture**: Each integration (USYC, StableFX, Bridge, CPN) has its own contract module for clean separation and upgradability.
+
+2. **Service Layer Pattern**: Frontend uses a service layer abstraction over wagmi for cleaner code organization and testability.
+
+3. **Event-Driven Design**: All contracts emit comprehensive events for off-chain indexing and real-time updates.
+
+4. **Role-Based Access**: Three-tier permission system (Owner → Admin → Operator) for enterprise governance.
+
+5. **Fail-Safe Mechanisms**: All operations have refund/rollback capabilities for failed transactions.
+
+---
+
+## Security Considerations
+
+- Private keys stored in `.env` files (never committed)
+- Large withdrawals require admin approval
+- Daily limits on fiat operations
+- Slippage protection on all swaps
+- Escrow dispute resolution mechanism
+
+---
+
 ## Notes
 
-- Arc Testnet uses USDC as the native gas token (18 decimals for gas)
+- Arc Testnet uses USDC as the native gas token
 - Mock tokens are used since Circle's real USYC/StableFX require whitelisting
 - `reference` is a reserved keyword in Solidity 0.8.20 - use `memo` instead
+
+---
 
 ## License
 
