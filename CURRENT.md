@@ -117,19 +117,19 @@ CPNGateway:         0x43b3910E08c10551B0E0B0630dEA3d27a0d3995c
 - TypeScript
 - TailwindCSS
 - shadcn/ui components
-- Wagmi v2 + Viem
-- RainbowKit
+- Wagmi v2 + Viem (custom wallet connection, no RainbowKit)
 - React Query
 
 ### Pages
 
 | Route         | Status  | Description                   |
 | ------------- | ------- | ----------------------------- |
-| `/`           | Working | Overview/landing page         |
-| `/treasury`   | Working | Treasury management dashboard |
-| `/escrow`     | Exists  | Freight escrow management     |
-| `/settlement` | Exists  | Cross-chain settlement        |
-| `/payroll`    | Exists  | Batch payroll processing      |
+| `/`           | Working | Overview with native + ERC20 USDC balances + skeletons |
+| `/treasury`   | Working | Treasury dashboard with live data + skeletons |
+| `/escrow`     | Working | Freight escrow management + skeletons |
+| `/settlement` | Working | USDC to EURC conversion + skeletons |
+| `/payroll`    | Working | Batch payroll processing + skeletons |
+| `/fiat`       | Working | CPN fiat on/off ramp + skeletons |
 
 ### Components
 
@@ -158,10 +158,11 @@ CPNGateway:         0x43b3910E08c10551B0E0B0630dEA3d27a0d3995c
 
 | Hook               | Purpose                   |
 | ------------------ | ------------------------- |
-| `useContracts.ts`  | All contract interactions |
-| `useTreasury.ts`   | Treasury-specific         |
-| `useFX.ts`         | FX engine                 |
-| `useSettlement.ts` | Settlement                |
+| `useContracts.ts`  | Token balances (native + ERC20), escrow, payroll |
+| `useTreasury.ts`   | Treasury manager operations |
+| `useFX.ts`         | FX engine swaps           |
+| `useSettlement.ts` | Cross-chain settlement    |
+| `useCPN.ts`        | Fiat on/off ramp          |
 
 ---
 
@@ -217,18 +218,41 @@ npm run dev
 
 ## Known Issues
 
-1. **Frontend hydration** - ConnectButton may not render immediately due to SSR; works in real browser
-2. **Treasury hooks** - Need to update to use TreasuryManager ABI instead of old Treasury ABI
-3. **Arc Testnet deployment** - Treasury suite deployed to testnet
+1. **Arc Testnet native currency** - Arc uses USDC as native gas token (not ETH). App now supports both native USDC and ERC20 MockUSDC.
+2. **Transaction history** - Uses mock data (needs The Graph/indexer integration)
+3. **Chain balances** - Uses mock data (needs Circle Gateway API)
 
 ---
 
-## Next Steps
+## Hackathon Final Sprint (< 24 hours)
 
+### Completed
 - [x] Deploy treasury suite to Arc Testnet
 - [x] Update frontend hooks to use new contract ABIs
-- [x] Add contract tests
-- [x] Implement real CPN integration
-- [x] Address frontend hydration issue with RainbowKit ConnectButton
-- [x] Add transaction history views
-- [x] Implement notification system
+- [x] Add contract tests (15 passing)
+- [x] Add native USDC balance support
+- [x] Wire `/treasury` page to existing hooks
+- [x] Add skeleton loading animations to all pages
+
+### In Progress
+- [ ] Real USYC integration via usyc.dev.hashnote.com
+- [ ] StableFX API integration (API-first approach)
+- [ ] Escrow GPS/Signature toggle simulation
+- [ ] Fiat page demo mode (pre-populated bank account)
+- [ ] Deep Savings counter prominence
+
+### Backlog (if time permits)
+- [ ] Create dedicated `/fx` page
+- [ ] Integrate The Graph for transaction history
+- [ ] Add Circle Gateway API for real chain balances
+
+---
+
+## Integration Status
+
+| Integration | Status | Notes |
+|-------------|--------|-------|
+| **USYC (Yield)** | ⚠️ Mock | Need to subscribe at usyc.dev.hashnote.com |
+| **StableFX (FX)** | ⚠️ Mock | Have API key, need to implement RFQ flow |
+| **CPN (Fiat)** | ⚠️ Mock | Demo mode with pre-populated bank account |
+| **Arc Bridge** | ⚠️ Mock | Using mock settlement router |

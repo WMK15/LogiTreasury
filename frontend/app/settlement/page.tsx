@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { parseUnits } from "viem";
 import { ConnectWallet } from "@/components/ui/ConnectWallet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatUSDC, formatEUR, CONTRACTS } from "@/lib/config";
 import {
   useUSDCBalance,
@@ -20,10 +21,10 @@ export default function SettlementPage() {
   const [amount, setAmount] = useState("");
   const [reference, setReference] = useState("");
 
-  const { data: usdcBalance } = useUSDCBalance(address);
-  const { data: eurcBalance } = useEURCBalance(address);
-  const { data: fxRate } = useCurrentFXRate();
-  const { data: settlementIds } = useSettlementHistory(address);
+  const { data: usdcBalance, isLoading: usdcLoading } = useUSDCBalance(address);
+  const { data: eurcBalance, isLoading: eurcLoading } = useEURCBalance(address);
+  const { data: fxRate, isLoading: rateLoading } = useCurrentFXRate();
+  const { data: settlementIds, isLoading: historyLoading } = useSettlementHistory(address);
 
   const amountBigInt = amount ? parseUnits(amount, 6) : undefined;
   const { data: quote } = useQuoteUsdcToEurc(amountBigInt);
@@ -86,22 +87,34 @@ export default function SettlementPage() {
         <h1 className="text-sm font-medium text-neutral-100">
           Euro Settlement
         </h1>
-        <p className="text-xs text-neutral-500">EUR/USD: {rate}</p>
+        {rateLoading ? (
+          <Skeleton className="h-4 w-24 bg-neutral-800" />
+        ) : (
+          <p className="text-xs text-neutral-500">EUR/USD: {rate}</p>
+        )}
       </div>
 
       {/* Balances */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="card">
           <p className="kpi-label mb-1">USDC Balance</p>
-          <p className="kpi-value">
-            {usdcBalance ? formatUSDC(usdcBalance) : "0.00"}
-          </p>
+          {usdcLoading ? (
+            <Skeleton className="h-7 w-28 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {usdcBalance ? formatUSDC(usdcBalance) : "0.00"}
+            </p>
+          )}
         </div>
         <div className="card">
           <p className="kpi-label mb-1">EURC Balance</p>
-          <p className="kpi-value">
-            {eurcBalance ? formatEUR(eurcBalance) : "0.00"}
-          </p>
+          {eurcLoading ? (
+            <Skeleton className="h-7 w-28 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {eurcBalance ? formatEUR(eurcBalance) : "0.00"}
+            </p>
+          )}
         </div>
       </div>
 
@@ -176,7 +189,12 @@ export default function SettlementPage() {
         <p className="text-xs text-neutral-500 uppercase tracking-wide mb-3">
           Settlement History
         </p>
-        {settlementIds && settlementIds.length > 0 ? (
+        {historyLoading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-32 bg-neutral-800" />
+            <Skeleton className="h-4 w-24 bg-neutral-800" />
+          </div>
+        ) : settlementIds && settlementIds.length > 0 ? (
           <p className="text-sm text-neutral-400">
             {settlementIds.length} settlements
           </p>

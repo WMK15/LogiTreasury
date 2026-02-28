@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { parseUnits } from "viem";
 import { ConnectWallet } from "@/components/ui/ConnectWallet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatUSDC, CONTRACTS } from "@/lib/config";
 import {
   useUSDCBalance,
@@ -27,10 +28,10 @@ export default function PayrollPage() {
     { wallet: "", amount: "", reference: "" },
   ]);
 
-  const { data: usdcBalance } = useUSDCBalance(address);
-  const { data: batchCount } = useBatchCount();
-  const { data: totalPaid } = useTotalPaidUsdc();
-  const { data: myBatches } = useInitiatorBatches(address);
+  const { data: usdcBalance, isLoading: balanceLoading } = useUSDCBalance(address);
+  const { data: batchCount, isLoading: batchLoading } = useBatchCount();
+  const { data: totalPaid, isLoading: paidLoading } = useTotalPaidUsdc();
+  const { data: myBatches, isLoading: batchesLoading } = useInitiatorBatches(address);
 
   const {
     approve,
@@ -116,17 +117,29 @@ export default function PayrollPage() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="card">
           <p className="kpi-label mb-1">Wallet Balance</p>
-          <p className="kpi-value">
-            {usdcBalance ? formatUSDC(usdcBalance) : "0"}
-          </p>
+          {balanceLoading ? (
+            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {usdcBalance ? formatUSDC(usdcBalance) : "0"}
+            </p>
+          )}
         </div>
         <div className="card">
           <p className="kpi-label mb-1">Total Batches</p>
-          <p className="kpi-value">{batchCount?.toString() || "0"}</p>
+          {batchLoading ? (
+            <Skeleton className="h-7 w-16 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">{batchCount?.toString() || "0"}</p>
+          )}
         </div>
         <div className="card">
           <p className="kpi-label mb-1">Total Paid</p>
-          <p className="kpi-value">{totalPaid ? formatUSDC(totalPaid) : "0"}</p>
+          {paidLoading ? (
+            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">{totalPaid ? formatUSDC(totalPaid) : "0"}</p>
+          )}
         </div>
       </div>
 

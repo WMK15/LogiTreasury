@@ -2,8 +2,10 @@
 
 import { useAccount } from "wagmi";
 import { ConnectWallet } from "@/components/ui/ConnectWallet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatUSDC, formatPercent } from "@/lib/config";
 import {
+  useNativeUSDCBalance,
   useUSDCBalance,
   useEURCBalance,
   useEscrowCount,
@@ -17,12 +19,13 @@ import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
 export default function Overview() {
   const { address, isConnected } = useAccount();
 
-  const { data: usdcBalance } = useUSDCBalance(address);
-  const { data: eurcBalance } = useEURCBalance(address);
-  const { balanceSnapshot, yieldMetrics } = useTreasuryDashboard();
-  const { data: escrowCount } = useEscrowCount();
-  const { data: batchCount } = useBatchCount();
-  const { data: rates } = useCurrentRates();
+  const { data: nativeBalance, isLoading: nativeLoading } = useNativeUSDCBalance(address);
+  const { data: usdcBalance, isLoading: usdcLoading } = useUSDCBalance(address);
+  const { data: eurcBalance, isLoading: eurcLoading } = useEURCBalance(address);
+  const { balanceSnapshot, yieldMetrics, isLoading: treasuryLoading } = useTreasuryDashboard();
+  const { data: escrowCount, isLoading: escrowLoading } = useEscrowCount();
+  const { data: batchCount, isLoading: batchLoading } = useBatchCount();
+  const { data: rates, isLoading: ratesLoading } = useCurrentRates();
 
   const treasuryBalance = balanceSnapshot?.totalValue;
   const treasuryYield = yieldMetrics?.unrealizedYield;
@@ -62,34 +65,54 @@ export default function Overview() {
           value={treasuryBalance ? formatUSDC(treasuryBalance) : "0.00"}
           suffix="USDC"
           highlight
+          loading={treasuryLoading}
         />
         <KPI
           label="Yield Accrued"
           value={treasuryYield ? formatUSDC(treasuryYield) : "0.00"}
           suffix="USDC"
+          loading={treasuryLoading}
         />
         <KPI
           label="Current APY"
           value={apy ? formatPercent(Number(apy)) : "—"}
+          loading={treasuryLoading}
         />
         <KPI
           label="EUR/USD Rate"
           value={fxRate ? (Number(fxRate) / 1e18).toFixed(4) : "—"}
+          loading={ratesLoading}
         />
       </div>
 
       {/* Secondary KPIs */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-5 gap-4 mb-8">
         <KPI
-          label="Wallet USDC"
+          label="Native USDC"
+          value={nativeBalance ? Number(nativeBalance.formatted).toFixed(2) : "0.00"}
+          highlight
+          loading={nativeLoading}
+        />
+        <KPI
+          label="ERC20 USDC"
           value={usdcBalance ? formatUSDC(usdcBalance) : "0.00"}
+          loading={usdcLoading}
         />
         <KPI
           label="Wallet EURC"
           value={eurcBalance ? formatUSDC(eurcBalance) : "0.00"}
+          loading={eurcLoading}
         />
-        <KPI label="Active Escrows" value={escrowCount?.toString() || "0"} />
-        <KPI label="Payroll Batches" value={batchCount?.toString() || "0"} />
+        <KPI 
+          label="Active Escrows" 
+          value={escrowCount?.toString() || "0"} 
+          loading={escrowLoading}
+        />
+        <KPI 
+          label="Payroll Batches" 
+          value={batchCount?.toString() || "0"} 
+          loading={batchLoading}
+        />
       </div>
 
       {/* Quick Actions */}
@@ -118,21 +141,27 @@ function KPI({
   value,
   suffix,
   highlight,
+  loading,
 }: {
   label: string;
   value: string;
   suffix?: string;
   highlight?: boolean;
+  loading?: boolean;
 }) {
   return (
     <div className="card">
       <p className="kpi-label mb-1">{label}</p>
-      <p className={`kpi-value ${highlight ? "text-neutral-50" : ""}`}>
-        {value}
-        {suffix && (
-          <span className="text-neutral-500 text-sm ml-1">{suffix}</span>
-        )}
-      </p>
+      {loading ? (
+        <Skeleton className="h-7 w-24 bg-neutral-800" />
+      ) : (
+        <p className={`kpi-value ${highlight ? "text-neutral-50" : ""}`}>
+          {value}
+          {suffix && (
+            <span className="text-neutral-500 text-sm ml-1">{suffix}</span>
+          )}
+        </p>
+      )}
     </div>
   );
 }

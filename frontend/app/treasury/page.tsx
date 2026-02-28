@@ -3,16 +3,26 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { ConnectWallet } from "@/components/ui/ConnectWallet";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   formatUSDC,
   formatPercent,
-  CONTRACTS,
   NETWORK_INFO,
 } from "@/lib/config";
+import { useTreasuryDashboard } from "@/hooks/useTreasury";
+import { useNativeUSDCBalance, useUSDCBalance } from "@/hooks/useContracts";
 
 export default function TreasuryPage() {
   const { address, isConnected } = useAccount();
   const [mounted, setMounted] = useState(false);
+
+  const { data: nativeBalance, isLoading: nativeLoading } = useNativeUSDCBalance(address);
+  const { data: usdcBalance, isLoading: usdcLoading } = useUSDCBalance(address);
+  const { 
+    balanceSnapshot, 
+    yieldMetrics, 
+    isLoading: treasuryLoading 
+  } = useTreasuryDashboard();
 
   useEffect(() => {
     setMounted(true);
@@ -46,6 +56,19 @@ export default function TreasuryPage() {
     );
   }
 
+  const totalBalance = balanceSnapshot?.totalValue;
+  const liquidBalance = balanceSnapshot?.liquidUsdc;
+  const yieldingBalance = balanceSnapshot?.yieldBearingUsdc;
+  const yieldAccrued = yieldMetrics?.unrealizedYield;
+  const currentAPY = yieldMetrics?.currentAPY;
+  
+  // Calculate allocation percentage
+  const yieldPercent = totalBalance && yieldingBalance 
+    ? Number((yieldingBalance * 100n) / totalBalance) 
+    : 0;
+
+  const isLoading = treasuryLoading || nativeLoading || usdcLoading;
+
   return (
     <div>
       {/* Header */}
@@ -58,22 +81,68 @@ export default function TreasuryPage() {
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="card">
           <p className="kpi-label mb-1">Total Balance</p>
-          <p className="kpi-value text-neutral-50">
-            0.00
-            <span className="text-neutral-500 text-sm ml-1">USDC</span>
-          </p>
+          {treasuryLoading ? (
+            <Skeleton className="h-7 w-28 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value text-neutral-50">
+              {totalBalance ? formatUSDC(totalBalance) : "0.00"}
+              <span className="text-neutral-500 text-sm ml-1">USDC</span>
+            </p>
+          )}
         </div>
         <div className="card">
           <p className="kpi-label mb-1">Liquid</p>
-          <p className="kpi-value">0.00</p>
+          {treasuryLoading ? (
+            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {liquidBalance ? formatUSDC(liquidBalance) : "0.00"}
+            </p>
+          )}
         </div>
         <div className="card">
           <p className="kpi-label mb-1">Yield Accrued</p>
-          <p className="kpi-value text-emerald-400">+0.00</p>
+          {treasuryLoading ? (
+            <Skeleton className="h-7 w-20 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value text-emerald-400">
+              +{yieldAccrued ? formatUSDC(yieldAccrued) : "0.00"}
+            </p>
+          )}
         </div>
         <div className="card">
           <p className="kpi-label mb-1">Current APY</p>
-          <p className="kpi-value">--</p>
+          {treasuryLoading ? (
+            <Skeleton className="h-7 w-16 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {currentAPY ? formatPercent(Number(currentAPY)) : "—"}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Wallet Balances */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="card">
+          <p className="kpi-label mb-1">Native USDC (Gas)</p>
+          {nativeLoading ? (
+            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {nativeBalance ? Number(nativeBalance.formatted).toFixed(2) : "0.00"}
+            </p>
+          )}
+        </div>
+        <div className="card">
+          <p className="kpi-label mb-1">ERC20 USDC (MockUSDC)</p>
+          {usdcLoading ? (
+            <Skeleton className="h-7 w-28 bg-neutral-800" />
+          ) : (
+            <p className="kpi-value">
+              {usdcBalance ? formatUSDC(usdcBalance) : "0.00"}
+            </p>
+          )}
         </div>
       </div>
 
@@ -83,14 +152,22 @@ export default function TreasuryPage() {
           <p className="text-xs text-neutral-500 uppercase tracking-wide">
             Allocation
           </p>
-          <p className="text-xs text-neutral-400">0% in yield</p>
+          {treasuryLoading ? (
+            <Skeleton className="h-4 w-20 bg-neutral-800" />
+          ) : (
+            <p className="text-xs text-neutral-400">{yieldPercent}% in yield</p>
+          )}
         </div>
-        <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-emerald-500/60 transition-all duration-300"
-            style={{ width: "0%" }}
-          />
-        </div>
+        {treasuryLoading ? (
+          <Skeleton className="h-2 w-full bg-neutral-800 rounded-full" />
+        ) : (
+          <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-emerald-500/60 transition-all duration-300"
+              style={{ width: `${yieldPercent}%` }}
+            />
+          </div>
+        )}
         <div className="flex justify-between text-xs text-neutral-500 mt-2">
           <span>USDC (Liquid)</span>
           <span>USYC (Yielding)</span>

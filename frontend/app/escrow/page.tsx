@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { ConnectWallet } from "@/components/ui/ConnectWallet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatUSDC, CONTRACTS } from "@/lib/config";
 import {
   useUSDCBalance,
@@ -19,9 +20,9 @@ export default function EscrowPage() {
   const { address, isConnected } = useAccount();
   const [view, setView] = useState<View>("shipper");
 
-  const { data: usdcBalance } = useUSDCBalance(address);
-  const { data: shipperEscrows } = useShipperEscrows(address);
-  const { data: carrierEscrows } = useCarrierEscrows(address);
+  const { data: usdcBalance, isLoading: balanceLoading } = useUSDCBalance(address);
+  const { data: shipperEscrows, isLoading: shipperLoading } = useShipperEscrows(address);
+  const { data: carrierEscrows, isLoading: carrierLoading } = useCarrierEscrows(address);
 
   if (!isConnected) {
     return (
@@ -39,9 +40,13 @@ export default function EscrowPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-sm font-medium text-neutral-100">Freight Escrow</h1>
-        <p className="text-xs text-neutral-500">
-          Wallet: {usdcBalance ? formatUSDC(usdcBalance) : "0"} USDC
-        </p>
+        {balanceLoading ? (
+          <Skeleton className="h-4 w-24 bg-neutral-800" />
+        ) : (
+          <p className="text-xs text-neutral-500">
+            Wallet: {usdcBalance ? formatUSDC(usdcBalance) : "0"} USDC
+          </p>
+        )}
       </div>
 
       {/* Tabs */}
@@ -65,10 +70,10 @@ export default function EscrowPage() {
 
       {/* Content */}
       {view === "shipper" && (
-        <EscrowList ids={shipperEscrows || []} role="shipper" />
+        <EscrowList ids={shipperEscrows || []} role="shipper" isLoading={shipperLoading} />
       )}
       {view === "carrier" && (
-        <EscrowList ids={carrierEscrows || []} role="carrier" />
+        <EscrowList ids={carrierEscrows || []} role="carrier" isLoading={carrierLoading} />
       )}
       {view === "create" && (
         <CreateEscrowForm onSuccess={() => setView("shipper")} />
@@ -96,13 +101,46 @@ function TabButton({
   );
 }
 
+function EscrowCardSkeleton() {
+  return (
+    <div className="card">
+      <div className="flex items-center justify-between mb-4">
+        <Skeleton className="h-5 w-32 bg-neutral-800" />
+        <Skeleton className="h-5 w-20 bg-neutral-800" />
+      </div>
+      <div className="space-y-3">
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-24 bg-neutral-800" />
+          <Skeleton className="h-4 w-32 bg-neutral-800" />
+        </div>
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-20 bg-neutral-800" />
+          <Skeleton className="h-4 w-28 bg-neutral-800" />
+        </div>
+        <Skeleton className="h-8 w-full bg-neutral-800 mt-4" />
+      </div>
+    </div>
+  );
+}
+
 function EscrowList({
   ids,
   role,
+  isLoading,
 }: {
   ids: readonly bigint[];
   role: "shipper" | "carrier";
+  isLoading?: boolean;
 }) {
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <EscrowCardSkeleton />
+        <EscrowCardSkeleton />
+      </div>
+    );
+  }
+
   if (!ids || ids.length === 0) {
     return (
       <div className="card">

@@ -4,6 +4,50 @@ All notable changes to the ArcLogistics Treasury project are documented here.
 
 ---
 
+## [Unreleased] - Hackathon Final Sprint
+
+### Planned
+- **Real USYC Integration** - Connect to Hashnote USYC on Arc Testnet via usyc.dev.hashnote.com
+- **StableFX API Integration** - Implement RFQ flow with Circle StableFX API
+- **Escrow GPS/Signature Toggles** - Demo simulation for delivery verification
+- **Fiat Demo Mode** - Pre-populated mock bank account for CPN demo
+- **Deep Savings Counter** - Prominent yield display
+
+---
+
+## [0.4.3] - 2026-02-28
+
+### Added
+- **Skeleton loading animations** - Added pulse loading skeletons across all pages:
+  - Homepage KPIs show skeleton while data loads
+  - Transaction history with skeleton rows
+  - Escrow page with card skeletons
+  - Settlement page with balance and rate skeletons
+  - Payroll page with KPI skeletons
+  - Fiat page with limits skeletons
+  - Treasury page fully wired to hooks with skeletons
+
+### Fixed
+- **Treasury page** - Now wired to actual `useTreasuryDashboard` hook instead of hardcoded values
+  - Shows real balance, liquid, yield accrued, APY
+  - Shows both native USDC and ERC20 USDC balances
+  - Allocation bar reflects actual yield percentage
+
+---
+
+## [0.4.2] - 2026-02-28
+
+### Added
+- **Native USDC balance support** - Arc Testnet uses USDC as native gas token:
+  - Added `useNativeUSDCBalance` hook using Wagmi's `useBalance`
+  - Homepage now shows both Native USDC (gas token) and ERC20 USDC (MockUSDC)
+  - 5-column KPI layout: Native USDC, ERC20 USDC, EURC, Escrows, Batches
+
+### Changed
+- **Network mode** - Switched to Arc Testnet (`NEXT_PUBLIC_NETWORK_MODE=testnet`)
+
+---
+
 ## [0.4.1] - 2026-02-28
 
 ### Fixed

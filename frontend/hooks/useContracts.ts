@@ -1,12 +1,25 @@
 "use client";
 
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useBalance } from "wagmi";
 import { parseUnits } from "viem";
 import { CONTRACTS, DECIMALS } from "@/lib/config";
 import { ERC20_ABI, FREIGHT_ESCROW_ABI, TREASURY_ABI, SETTLEMENT_ABI, BATCH_PAYROLL_ABI } from "@/abi";
 
 // ============ Token Hooks ============
 
+/**
+ * Native USDC balance (Arc Testnet uses USDC as native gas token)
+ */
+export function useNativeUSDCBalance(address: `0x${string}` | undefined) {
+  return useBalance({
+    address,
+    query: { enabled: !!address },
+  });
+}
+
+/**
+ * ERC20 USDC balance (MockUSDC on testnet)
+ */
 export function useUSDCBalance(address: `0x${string}` | undefined) {
   return useReadContract({
     address: CONTRACTS.usdc,
