@@ -3,7 +3,7 @@
  * React hooks for StableFX operations
  */
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { fxExecutionEngineAbi } from '@/abi/FXExecutionEngine';
 import { parseUnits } from 'viem';
@@ -11,7 +11,82 @@ import { SwapDirection, type FXQuote, type FXExposure, type RateSnapshot } from 
 
 import { CONTRACTS } from '@/lib/config';
 
+// ============ StableFX API Types ============
+
+export interface StableFXRatesResponse {
+  success: boolean;
+  data: {
+    rates: {
+      USDC_EURC: { rate: string; inverseRate: string; spread: string; timestamp: string };
+      EURC_USDC: { rate: string; inverseRate: string; spread: string; timestamp: string };
+    };
+    isDemoMode: boolean;
+    provider: string;
+  };
+  timestamp: number;
+}
+
+export interface StableFXQuoteResponse {
+  success: boolean;
+  data: {
+    quoteId: string;
+    sourceCurrency: string;
+    targetCurrency: string;
+    sourceAmount: string;
+    targetAmount: string;
+    exchangeRate: string;
+    inverseRate: string;
+    expiresAt: string;
+    createdAt: string;
+  };
+  isDemoMode: boolean;
+  timestamp: number;
+}
+
 const FX_ENGINE_ADDRESS = CONTRACTS.fxEngine;
+
+// ============ StableFX API Hooks ============
+
+/**
+ * Get live rates from StableFX API
+ */
+export function useStableFXRates() {
+  return useQuery({
+    queryKey: ['stablefx-rates'],
+    queryFn: async (): Promise<StableFXRatesResponse> => {
+      const response = await fetch('/api/fx/stablefx');
+      if (!response.ok) throw new Error('Failed to fetch StableFX rates');
+      return response.json();
+    },
+    refetchInterval: 5000, // Refresh every 5 seconds for live rates
+    staleTime: 3000,
+  });
+}
+
+/**
+ * Request a quote from StableFX API
+ */
+export function useStableFXQuote(
+  sourceCurrency: 'USDC' | 'EURC',
+  targetCurrency: 'USDC' | 'EURC',
+  sourceAmount: string | undefined
+) {
+  return useQuery({
+    queryKey: ['stablefx-quote', sourceCurrency, targetCurrency, sourceAmount],
+    queryFn: async (): Promise<StableFXQuoteResponse> => {
+      const response = await fetch('/api/fx/stablefx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceCurrency, targetCurrency, sourceAmount }),
+      });
+      if (!response.ok) throw new Error('Failed to get quote');
+      return response.json();
+    },
+    enabled: !!sourceAmount && parseFloat(sourceAmount) > 0,
+    refetchInterval: 10000, // Refresh quote every 10 seconds
+    staleTime: 5000,
+  });
+}
 
 // ============ Read Hooks ============
 

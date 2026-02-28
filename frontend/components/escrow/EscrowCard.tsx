@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { formatUSDC, shortenAddress } from "@/lib/config";
 import { useShipment, useEscrowYield, useFundEscrow, useConfirmDelivery, useReleaseFunds } from "@/hooks/useContracts";
 import { EscrowStatus, EscrowStatusLabel } from "@/types";
@@ -7,6 +8,11 @@ import { EscrowStatus, EscrowStatusLabel } from "@/types";
 interface Props {
   escrowId: bigint;
   role: "shipper" | "carrier";
+}
+
+interface DeliveryVerification {
+  gpsArrived: boolean;
+  signatureVerified: boolean;
 }
 
 const statusStyles: Record<EscrowStatus, string> = {
@@ -27,6 +33,12 @@ export function EscrowCard({ escrowId, role }: Props) {
   const { confirm, isPending: isConfirming } = useConfirmDelivery();
   const { release, isPending: isReleasing } = useReleaseFunds();
 
+  // Delivery verification state (simulated IoT/GPS data)
+  const [verification, setVerification] = useState<DeliveryVerification>({
+    gpsArrived: false,
+    signatureVerified: false,
+  });
+
   if (isLoading || !shipment) {
     return (
       <div className="card">
@@ -40,6 +52,10 @@ export function EscrowCard({ escrowId, role }: Props) {
   const canFund = role === "shipper" && status === EscrowStatus.CREATED;
   const canConfirmDelivery = role === "carrier" && (status === EscrowStatus.FUNDED || status === EscrowStatus.IN_TRANSIT);
   const canRelease = status === EscrowStatus.DELIVERED;
+  
+  // Both conditions must be verified before release is allowed
+  const deliveryFullyVerified = verification.gpsArrived && verification.signatureVerified;
+  const showVerificationPanel = canRelease || (status === EscrowStatus.FUNDED || status === EscrowStatus.IN_TRANSIT);
 
   return (
     <div className="card">
@@ -88,6 +104,80 @@ export function EscrowCard({ escrowId, role }: Props) {
         )}
       </div>
 
+      {/* Delivery Verification Panel */}
+      {showVerificationPanel && (
+        <div className="border border-neutral-800 rounded-lg p-3 mb-4 bg-neutral-900/50">
+          <p className="text-xs text-neutral-500 uppercase tracking-wide mb-3">
+            Delivery Verification
+          </p>
+          <div className="space-y-2">
+            {/* GPS Geofence Check */}
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={verification.gpsArrived}
+                onChange={(e) => setVerification(prev => ({ ...prev, gpsArrived: e.target.checked }))}
+                className="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-emerald-500 
+                           focus:ring-emerald-500 focus:ring-offset-0 focus:ring-1 cursor-pointer"
+              />
+              <div className="flex items-center gap-2 flex-1">
+                <span className="text-lg">📍</span>
+                <div>
+                  <p className={`text-sm ${verification.gpsArrived ? 'text-emerald-400' : 'text-neutral-300'}`}>
+                    GPS Geofence Verified
+                  </p>
+                  <p className="text-xs text-neutral-500">
+                    {verification.gpsArrived 
+                      ? `Truck arrived at ${shipment.destination}` 
+                      : 'Waiting for truck to enter delivery zone'}
+                  </p>
+                </div>
+              </div>
+              {verification.gpsArrived && (
+                <span className="text-emerald-400 text-xs font-medium">VERIFIED</span>
+              )}
+            </label>
+
+            {/* Driver Signature */}
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={verification.signatureVerified}
+                onChange={(e) => setVerification(prev => ({ ...prev, signatureVerified: e.target.checked }))}
+                className="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-emerald-500 
+                           focus:ring-emerald-500 focus:ring-offset-0 focus:ring-1 cursor-pointer"
+              />
+              <div className="flex items-center gap-2 flex-1">
+                <span className="text-lg">✍️</span>
+                <div>
+                  <p className={`text-sm ${verification.signatureVerified ? 'text-emerald-400' : 'text-neutral-300'}`}>
+                    Recipient Signature
+                  </p>
+                  <p className="text-xs text-neutral-500">
+                    {verification.signatureVerified 
+                      ? 'Digital signature captured' 
+                      : 'Awaiting recipient confirmation'}
+                  </p>
+                </div>
+              </div>
+              {verification.signatureVerified && (
+                <span className="text-emerald-400 text-xs font-medium">SIGNED</span>
+              )}
+            </label>
+          </div>
+
+          {/* Verification Status */}
+          {deliveryFullyVerified && (
+            <div className="mt-3 pt-3 border-t border-neutral-800">
+              <div className="flex items-center gap-2 text-emerald-400">
+                <span>✓</span>
+                <p className="text-sm font-medium">All delivery conditions verified - funds can be released</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex gap-2">
         {canFund && (
@@ -111,10 +201,11 @@ export function EscrowCard({ escrowId, role }: Props) {
         {canRelease && (
           <button
             onClick={() => release(escrowId)}
-            disabled={isReleasing}
-            className="btn-secondary"
+            disabled={isReleasing || !deliveryFullyVerified}
+            className={`btn-secondary ${!deliveryFullyVerified ? 'opacity-50 cursor-not-allowed' : ''}`}
+            title={!deliveryFullyVerified ? 'Complete all verification steps first' : ''}
           >
-            {isReleasing ? "Releasing..." : "Release Funds"}
+            {isReleasing ? "Releasing..." : deliveryFullyVerified ? "Release Funds" : "Verify Delivery First"}
           </button>
         )}
       </div>

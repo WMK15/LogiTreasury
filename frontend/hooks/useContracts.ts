@@ -40,6 +40,19 @@ export function useEURCBalance(address: `0x${string}` | undefined) {
   });
 }
 
+/**
+ * USYC balance (Real Hashnote USYC on Arc Testnet)
+ */
+export function useUSYCBalance(address: `0x${string}` | undefined) {
+  return useReadContract({
+    address: CONTRACTS.usyc,
+    abi: ERC20_ABI,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address },
+  });
+}
+
 export function useApproveToken(tokenAddress: `0x${string}`) {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });

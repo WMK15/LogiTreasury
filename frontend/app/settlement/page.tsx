@@ -15,6 +15,7 @@ import {
   useSettleUsdcToEurc,
   useSettlementHistory,
 } from "@/hooks/useContracts";
+import { useStableFXRates, useStableFXQuote } from "@/hooks/useFX";
 
 export default function SettlementPage() {
   const { address, isConnected } = useAccount();
@@ -25,6 +26,10 @@ export default function SettlementPage() {
   const { data: eurcBalance, isLoading: eurcLoading } = useEURCBalance(address);
   const { data: fxRate, isLoading: rateLoading } = useCurrentFXRate();
   const { data: settlementIds, isLoading: historyLoading } = useSettlementHistory(address);
+
+  // StableFX live rates
+  const { data: stableFXData, isLoading: stableFXLoading, dataUpdatedAt } = useStableFXRates();
+  const { data: stableFXQuote } = useStableFXQuote('USDC', 'EURC', amount || undefined);
 
   const amountBigInt = amount ? parseUnits(amount, 6) : undefined;
   const { data: quote } = useQuoteUsdcToEurc(amountBigInt);
@@ -77,8 +82,19 @@ export default function SettlementPage() {
     );
   }
 
-  const rate = fxRate ? (Number(fxRate) / 1e18).toFixed(4) : "—";
-  const expectedEurc = quote ? formatEUR(quote[0]) : "0.00";
+  // Use StableFX rate if available, fallback to on-chain rate
+  const stableFXRate = stableFXData?.data?.rates?.USDC_EURC?.rate;
+  const rate = stableFXRate || (fxRate ? (Number(fxRate) / 1e18).toFixed(4) : "—");
+  const isDemoMode = stableFXData?.data?.isDemoMode;
+  const provider = stableFXData?.data?.provider || 'On-chain';
+  
+  // Use StableFX quote if available
+  const expectedEurc = stableFXQuote?.data?.targetAmount 
+    ? parseFloat(stableFXQuote.data.targetAmount).toFixed(2)
+    : quote ? formatEUR(quote[0]) : "0.00";
+
+  // Calculate time since last update
+  const lastUpdateSecs = dataUpdatedAt ? Math.floor((Date.now() - dataUpdatedAt) / 1000) : 0;
 
   return (
     <div>
@@ -87,11 +103,36 @@ export default function SettlementPage() {
         <h1 className="text-sm font-medium text-neutral-100">
           Euro Settlement
         </h1>
-        {rateLoading ? (
-          <Skeleton className="h-4 w-24 bg-neutral-800" />
-        ) : (
-          <p className="text-xs text-neutral-500">EUR/USD: {rate}</p>
-        )}
+        <div className="flex items-center gap-3">
+          {/* Live Rate Indicator */}
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${stableFXLoading ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'}`} />
+            <span className="text-xs text-neutral-500">
+              {stableFXLoading ? 'Updating...' : `Live ${lastUpdateSecs}s ago`}
+            </span>
+          </div>
+          {rateLoading && !stableFXRate ? (
+            <Skeleton className="h-4 w-24 bg-neutral-800" />
+          ) : (
+            <p className="text-xs text-neutral-400">
+              EUR/USD: <span className="text-neutral-100 font-medium">{rate}</span>
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* StableFX Provider Banner */}
+      <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg px-4 py-2 mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-blue-400">⬡</span>
+          <p className="text-sm text-blue-300">
+            Powered by <span className="font-medium">{provider}</span>
+            {isDemoMode && <span className="text-blue-400/60 ml-2">(Demo Mode)</span>}
+          </p>
+        </div>
+        <p className="text-xs text-blue-400/60">
+          Spread: {stableFXData?.data?.rates?.USDC_EURC?.spread || '0.15%'}
+        </p>
       </div>
 
       {/* Balances */}
@@ -140,7 +181,7 @@ export default function SettlementPage() {
             <div className="bg-neutral-800/50 rounded-md p-3">
               <div className="flex justify-between text-sm">
                 <span className="text-neutral-500">You receive</span>
-                <span className="text-neutral-100 tabular-nums">
+                <span className="text-neutral-100 tabular-nums font-medium">
                   {expectedEurc} EURC
                 </span>
               </div>
@@ -148,6 +189,12 @@ export default function SettlementPage() {
                 <span className="text-neutral-600">Rate</span>
                 <span className="text-neutral-500">1 USDC = {rate} EURC</span>
               </div>
+              {stableFXQuote?.data?.expiresAt && (
+                <div className="flex justify-between text-xs mt-1">
+                  <span className="text-neutral-600">Quote expires</span>
+                  <QuoteCountdown expiresAt={stableFXQuote.data.expiresAt} />
+                </div>
+              )}
             </div>
           )}
 
@@ -203,5 +250,33 @@ export default function SettlementPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Quote expiration countdown component
+function QuoteCountdown({ expiresAt }: { expiresAt: string }) {
+  const [secondsLeft, setSecondsLeft] = useState(0);
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const expiry = new Date(expiresAt).getTime();
+      const now = Date.now();
+      const diff = Math.max(0, Math.floor((expiry - now) / 1000));
+      setSecondsLeft(diff);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [expiresAt]);
+
+  if (secondsLeft <= 0) {
+    return <span className="text-red-400">Expired</span>;
+  }
+
+  return (
+    <span className={`tabular-nums ${secondsLeft <= 10 ? 'text-amber-400' : 'text-neutral-500'}`}>
+      {secondsLeft}s
+    </span>
   );
 }

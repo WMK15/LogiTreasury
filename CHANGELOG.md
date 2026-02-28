@@ -6,6 +6,37 @@ All notable changes to the ArcLogistics Treasury project are documented here.
 
 ## [Unreleased] - Hackathon Final Sprint
 
+### Added
+- **Deep Savings Hero Card** - Prominent USYC yield display on homepage:
+  - Large USYC balance with emerald gradient styling
+  - Real-time yield accrued counter
+  - "No Capital Sits Idle" tagline
+  - Links to Hashnote T-Bill backing
+
+- **Escrow GPS/Signature Verification** - Delivery verification simulation:
+  - GPS geofence checkbox (truck arrived at destination)
+  - Recipient signature checkbox (digital signature captured)
+  - Both conditions must be verified before funds release
+  - Visual verification status indicators
+  - Release button disabled until fully verified
+
+- **useUSYCBalance hook** - Reads USYC balance from real Hashnote contract
+
+- **StableFX API Integration** - Real Circle StableFX API support:
+  - Created `stablefx-api.service.ts` for API calls
+  - New `/api/fx/stablefx` endpoint for live rates and quotes
+  - `useStableFXRates` hook with 5-second auto-refresh
+  - `useStableFXQuote` hook for real-time quote generation
+  - Demo mode fallback when API key is test key
+  - Realistic rate variance simulation in demo mode
+
+- **Enhanced Settlement Page** - Live FX rate experience:
+  - Live rate indicator with green pulse and "last updated" timer
+  - StableFX provider banner showing source and spread
+  - Quote expiration countdown timer
+  - Real-time quote updates as you type amount
+  - Fallback to on-chain rates when API unavailable
+
 ### Removed
 - **Payroll feature** - Removed entirely to focus on core logistics treasury flow:
   - Deleted `/payroll` page
@@ -13,14 +44,9 @@ All notable changes to the ArcLogistics Treasury project are documented here.
   - Removed payroll types and navigation links
   - Removed `batchPayroll` from contracts config
 
-### Planned
-- **Real USYC Integration** - Connect to Hashnote USYC on Arc Testnet via usyc.dev.hashnote.com
-- **StableFX API Integration** - Implement RFQ flow with Circle StableFX API
-- **Escrow GPS/Signature Toggles** - Demo simulation for delivery verification
-- **Deep Savings Counter** - Prominent yield display
-
 ### Changed
-- **Fiat Demo Mode** - Pre-populated mock bank account for CPN demo (completed)
+- **Fiat Demo Mode** - Pre-populated mock bank account for CPN demo
+- **USYC Address** - Updated to real Hashnote contract `0x9fdF14c5B14173D74C08Af27AebFf39240dC105A`
 
 ---
 
