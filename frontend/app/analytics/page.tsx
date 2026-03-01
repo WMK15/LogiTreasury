@@ -6,7 +6,7 @@ import { ConnectWallet } from "@/components/ui/ConnectWallet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatUSDC, formatPercent } from "@/lib/config";
 import {
-  useUSDCBalance,
+  useNativeUSDCBalance,
   useEURCBalance,
   useUSYCBalance,
 } from "@/hooks/useContracts";
@@ -85,14 +85,15 @@ export default function AnalyticsPage() {
 
   useEffect(() => setMounted(true), []);
 
-  const { data: usdcBalance, isLoading: usdcLoading } = useUSDCBalance(address);
+  const { data: nativeBalance, isLoading: nativeLoading } =
+    useNativeUSDCBalance(address);
   const { data: eurcBalance, isLoading: eurcLoading } = useEURCBalance(address);
   const { data: usycBalance, isLoading: usycLoading } = useUSYCBalance(address);
   const { yieldMetrics, isLoading: treasuryLoading } = useTreasuryDashboard();
   const { data: fxExposure } = useFXExposure();
 
   // Calculate allocations
-  const usdcValue = usdcBalance ? Number(usdcBalance) / 1e6 : 0;
+  const usdcValue = nativeBalance ? Number(nativeBalance.formatted) : 0;
   const eurcValue = eurcBalance ? Number(eurcBalance) / 1e6 : 0;
   const usycValue = usycBalance ? Number(usycBalance as bigint) / 1e6 : 0;
   const totalAssets = usdcValue + eurcValue + usycValue || 1;
@@ -167,7 +168,7 @@ export default function AnalyticsPage() {
         <div className="flex items-center gap-4 mb-4 text-[10px] text-neutral-500">
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
-            USDC {usdcPct}%
+            Native USDC {usdcPct}%
           </span>
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />
@@ -202,7 +203,9 @@ export default function AnalyticsPage() {
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-neutral-200">
-                    {currency.symbol}
+                    {currency.symbol === "USDC"
+                      ? "Native USDC"
+                      : currency.symbol}
                   </span>
                   <span
                     className={`text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-medium ${

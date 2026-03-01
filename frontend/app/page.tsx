@@ -7,19 +7,23 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatUSDC, formatPercent } from "@/lib/config";
 import {
   useNativeUSDCBalance,
-  useUSDCBalance,
   useEURCBalance,
   useUSYCBalance,
   useEscrowCount,
 } from "@/hooks/useContracts";
 import { useTreasuryDashboard } from "@/hooks/useTreasury";
-import { useCurrentRates } from "@/hooks/useFX";
+import { useStableFXRates } from "@/hooks/useFX";
 import { RateSnapshot } from "@/types/treasury";
 import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
 import {
   getTreasuryAdvice,
   type TreasuryRecommendation,
 } from "@/app/actions/getTreasuryAdvice";
+import {
+  getRecentConversions,
+  type RecentConversion,
+} from "@/app/actions/getRecentConversions";
+import { type BankAccount } from "@/app/actions/getBankBalances";
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
@@ -27,6 +31,9 @@ export default function Dashboard() {
   const [aiEnabled, setAiEnabled] = useState(true);
   const [recommendation, setRecommendation] =
     useState<TreasuryRecommendation | null>(null);
+  const [conversions, setConversions] = useState<RecentConversion[] | null>(
+    null,
+  );
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => setMounted(true), []);
@@ -35,7 +42,6 @@ export default function Dashboard() {
 
   const { data: nativeBalance, isLoading: nativeLoading } =
     useNativeUSDCBalance(address);
-  const { data: usdcBalance, isLoading: usdcLoading } = useUSDCBalance(address);
   const { data: eurcBalance, isLoading: eurcLoading } = useEURCBalance(address);
   const { data: usycBalance, isLoading: usycLoading } = useUSYCBalance(address);
   const {
@@ -44,23 +50,34 @@ export default function Dashboard() {
     isLoading: treasuryLoading,
   } = useTreasuryDashboard();
   const { data: escrowCount, isLoading: escrowLoading } = useEscrowCount();
-  const { data: rates, isLoading: ratesLoading } = useCurrentRates();
+  const { data: ratesData, isLoading: ratesLoading } = useStableFXRates();
 
-  // Bank balance — $0 until real CPN/bank integration
-  const bankBalance = 0;
-  const treasuryBalance = balanceSnapshot?.totalValue;
-  const apy = yieldMetrics?.currentAPY;
-  const fxRate = (rates as RateSnapshot)?.usdcToEurcRate;
-  const yieldAccrued = yieldMetrics?.unrealizedYield;
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [bankLoading, setBankLoading] = useState(true);
+
+  // Load bank balances
+  useEffect(() => {
+    import("@/app/actions/getBankBalances").then(({ getBankBalances }) => {
+      getBankBalances("11111111-1111-1111-1111-111111111111").then((data) => {
+        setBankAccounts(data);
+        setBankLoading(false);
+      });
+    });
+  }, []);
+
+  const bankBalance = bankAccounts.reduce((sum, acc) => sum + acc.balance, 0);
 
   // Total liquidity = bank + onchain
   const onchainUsdcValue = nativeBalance ? Number(nativeBalance.formatted) : 0;
-  const erc20UsdcValue = usdcBalance ? Number(usdcBalance) / 1e6 : 0;
   const eurcValue = eurcBalance ? Number(eurcBalance) / 1e6 : 0;
   const usycValue = usycBalance ? Number(usycBalance as bigint) / 1e6 : 0;
-  const totalOnchain =
-    onchainUsdcValue + erc20UsdcValue + eurcValue + usycValue;
+  const totalOnchain = onchainUsdcValue + eurcValue + usycValue;
   const totalLiquidity = bankBalance + totalOnchain;
+
+  const treasuryBalance = onchainUsdcValue;
+  const apy = yieldMetrics?.currentAPY;
+  const fxRate = ratesData?.data?.rates?.USDC_EURC?.rate;
+  const yieldAccrued = yieldMetrics?.unrealizedYield;
 
   // Load AI recommendation
   useEffect(() => {
@@ -117,7 +134,7 @@ export default function Dashboard() {
             <p className="text-xs text-blue-400 uppercase tracking-wider font-medium mb-2">
               Total Liquidity
             </p>
-            {treasuryLoading || nativeLoading || usdcLoading ? (
+            {treasuryLoading || nativeLoading ? (
               <Skeleton className="h-10 w-40 bg-blue-800/30" />
             ) : (
               <p className="text-3xl font-bold text-neutral-50">
@@ -136,7 +153,7 @@ export default function Dashboard() {
             onClick={() => setDrillDownOpen(!drillDownOpen)}
             className="btn-secondary text-xs"
           >
-            {drillDownOpen ? "Hide" : "Drill Down"} ▾
+            {drillDownOpen ? "Hide ▴" : "Drill Down ▾"}
           </button>
         </div>
 
@@ -179,15 +196,11 @@ export default function Dashboard() {
                     </span>
                   </div>
                   <div className="flex justify-between text-[10px]">
-                    <span className="text-neutral-500">ERC20 USDC</span>
-                    <span className="text-neutral-400 tabular-nums">
-                      {usdcLoading ? "..." : `$${erc20UsdcValue.toFixed(2)}`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-[10px]">
                     <span className="text-neutral-500">EURC</span>
                     <span className="text-neutral-400 tabular-nums">
-                      {eurcLoading ? "..." : `$${eurcValue.toFixed(2)}`}
+                      {eurcLoading
+                        ? "..."
+                        : `$${eurcValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-[10px]">
@@ -225,8 +238,8 @@ export default function Dashboard() {
             }`}
           >
             <span
-              className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${
-                aiEnabled ? "translate-x-5" : "translate-x-0.5"
+              className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                aiEnabled ? "translate-x-5" : "translate-x-0"
               }`}
             />
           </button>
@@ -247,6 +260,21 @@ export default function Dashboard() {
             ) : (
               <>
                 {/* AI Reasoning */}
+                <div className="bg-emerald-950/20 border border-emerald-900/40 rounded-md p-3 mb-4">
+                  <p className="text-sm text-neutral-300">
+                    <span className="font-semibold text-emerald-400">
+                      Total Idle Cash Detected:{" "}
+                    </span>
+                    <span className="tabular-nums">
+                      ${recommendation.idleUsdcAmount.toLocaleString()}
+                    </span>
+                  </p>
+                  <p className="text-xs text-neutral-500 mt-1">
+                    (Current USDC Balance - Upcoming Obligations in the Next 5
+                    Days)
+                  </p>
+                </div>
+
                 <p className="text-xs text-neutral-400 leading-relaxed mb-4">
                   {recommendation.reasoning}
                 </p>
@@ -277,17 +305,15 @@ export default function Dashboard() {
                           {rec.urgency}
                         </span>
                       </div>
-                      <p className="text-xs text-neutral-200 font-medium mb-1">
-                        {rec.action === "SWEEP_TO_USYC"
-                          ? "Convert to USYC"
-                          : rec.action === "FX_CONVERSION"
-                            ? "Convert via StableFX"
-                            : "Hold Liquid"}
+                      <p className="text-xs text-neutral-200 font-medium mb-1 truncate">
+                        {rec.description}
                       </p>
                       <p className="text-lg font-bold text-neutral-100 tabular-nums mb-1">
                         ${rec.amount.toLocaleString()}
                       </p>
-                      <p className="text-[10px] text-neutral-500">
+                      <p
+                        className={`text-[10px] ${rec.urgency === "HIGH" ? "text-emerald-400" : "text-neutral-500"}`}
+                      >
                         {rec.expectedReturn}
                       </p>
                     </div>
@@ -296,28 +322,81 @@ export default function Dashboard() {
 
                 {/* Projected Earnings Summary */}
                 {recommendation.shouldSweep && (
-                  <div className="mt-4 pt-3 border-t border-neutral-800 flex items-center justify-between">
-                    <p className="text-xs text-neutral-500">
-                      Projected earnings if recommendations applied:
-                    </p>
-                    <div className="flex items-center gap-4">
+                  <div className="mt-4 pt-4 border-t border-neutral-800 flex items-center justify-between bg-emerald-900/10 -mx-4 px-4 pb-2">
+                    <div>
+                      <p className="text-sm font-medium text-emerald-400">
+                        Enabled: Passive Analytics
+                      </p>
+                      <p className="text-[10px] text-neutral-500 mt-0.5">
+                        Sweeping 40% of true idle liquidity automatically.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-6">
                       <div className="text-right">
-                        <p className="text-[10px] text-neutral-500">Monthly</p>
-                        <p className="text-sm font-medium text-emerald-400">
-                          +${recommendation.projectedMonthlyYield.toFixed(2)}
+                        <p className="text-[10px] text-neutral-500 uppercase tracking-wider">
+                          Plus Earned (30d)
                         </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] text-neutral-500">Annual</p>
-                        <p className="text-sm font-medium text-emerald-400">
-                          +$
-                          {recommendation.projectedAnnualYield.toLocaleString()}
+                        <p className="text-xl font-bold text-emerald-400 tabular-nums">
+                          +${recommendation.projectedMonthlyYield.toFixed(2)}
                         </p>
                       </div>
                     </div>
                   </div>
                 )}
               </>
+            )}
+
+            {/* Recent USYC Conversions Logs */}
+            {!isPending && conversions && conversions.length > 0 && (
+              <div className="mt-6 pt-4 border-t border-neutral-800/50">
+                <p className="text-xs font-medium text-neutral-400 mb-3 ml-1 uppercase tracking-wider">
+                  Recent AI Conversions
+                </p>
+                <div className="space-y-2">
+                  {conversions.map((conv) => (
+                    <div
+                      key={conv.id}
+                      className="flex items-center justify-between p-2 rounded-md bg-neutral-900/40 hover:bg-neutral-800/40 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <span className="text-emerald-400 text-[10px]">
+                            USYC
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-xs text-neutral-200 font-medium">
+                            ${conv.amount.toLocaleString()} Sweep
+                          </p>
+                          <p className="text-[10px] text-neutral-500">
+                            {new Date(conv.date).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] text-neutral-500 mb-0.5">
+                          Tax Incurred
+                        </p>
+                        <p className="text-xs font-medium text-red-400/80 tabular-nums">
+                          -$
+                          {conv.taxWithheld.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                        <p className="text-[8px] text-neutral-600">
+                          Basis: ${conv.taxBasis.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </>
         )}
@@ -326,14 +405,16 @@ export default function Dashboard() {
       {/* ═══════════════════════════════════════════════════════ */}
       {/* 3. QUICK STATS ROW                                     */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="card">
-          <p className="kpi-label mb-1">Treasury Balance</p>
+          <p className="kpi-label mb-1">Treasury</p>
           {treasuryLoading ? (
             <Skeleton className="h-7 w-24 bg-neutral-800" />
           ) : (
             <p className="kpi-value text-neutral-50">
-              {treasuryBalance ? formatUSDC(treasuryBalance) : "0.00"}
+              {treasuryBalance
+                ? formatUSDC(BigInt(Math.floor(treasuryBalance * 1e6)))
+                : "0.00"}
               <span className="text-neutral-500 text-sm ml-1">USDC</span>
             </p>
           )}
@@ -349,16 +430,6 @@ export default function Dashboard() {
           )}
         </div>
         <div className="card">
-          <p className="kpi-label mb-1">EUR/USD Rate</p>
-          {ratesLoading ? (
-            <Skeleton className="h-7 w-16 bg-neutral-800" />
-          ) : (
-            <p className="kpi-value">
-              {fxRate ? (Number(fxRate) / 1e18).toFixed(4) : "0.9200"}
-            </p>
-          )}
-        </div>
-        <div className="card">
           <p className="kpi-label mb-1">Active Escrows</p>
           {escrowLoading ? (
             <Skeleton className="h-7 w-8 bg-neutral-800" />
@@ -369,27 +440,13 @@ export default function Dashboard() {
       </div>
 
       {/* Wallet Balances */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="card">
-          <p className="kpi-label mb-1">Native USDC (Gas)</p>
-          {nativeLoading ? (
-            <Skeleton className="h-7 w-24 bg-neutral-800" />
+          <p className="kpi-label mb-1">EUR/USD Rate</p>
+          {ratesLoading ? (
+            <Skeleton className="h-7 w-16 bg-neutral-800" />
           ) : (
-            <p className="kpi-value">
-              {nativeBalance
-                ? Number(nativeBalance.formatted).toFixed(2)
-                : "0.00"}
-            </p>
-          )}
-        </div>
-        <div className="card">
-          <p className="kpi-label mb-1">ERC20 USDC</p>
-          {usdcLoading ? (
-            <Skeleton className="h-7 w-24 bg-neutral-800" />
-          ) : (
-            <p className="kpi-value">
-              {usdcBalance ? formatUSDC(usdcBalance) : "0.00"}
-            </p>
+            <p className="kpi-value">{fxRate || "0.9520"}</p>
           )}
         </div>
         <div className="card">

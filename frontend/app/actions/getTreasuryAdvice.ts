@@ -32,7 +32,7 @@ export interface RecommendationItem {
 const IDLE_THRESHOLD_USD = 20_000;
 const SWEEP_PERCENTAGE = 0.40; // 40% of idle funds
 const CURRENT_TBILL_APY = 0.048; // 4.8% annual T-Bill yield
-const EUR_USD_RATE = 0.92;
+const EUR_USD_RATE = 0.95;
 
 // ============ Mock Data (Fallback) ============
 
@@ -105,7 +105,22 @@ export async function getTreasuryAdvice(
     const usycBalance = typedBalances.find(b => b.asset_type === 'USYC')?.amount || 0;
 
     const bankBalance = typedCompany.bank_balance_usd;
-    const idleUsdc = usdcBalance; // USDC not in yield = idle
+
+    // Fetch upcoming obligations (pending transactions in next 5 days)
+    const fiveDaysFromNow = new Date(Date.now() + 5 * 24 * 3600 * 1000).toISOString();
+    const { data: pendingTxs } = await supabase
+      .from('transactions')
+      .select('fiat_value_usd')
+      .eq('company_id', companyId)
+      .eq('status', 'PENDING')
+      .lt('created_at', fiveDaysFromNow);
+      
+    const upcomingObligations = pendingTxs 
+      ? pendingTxs.reduce((sum, tx) => sum + Number(tx.fiat_value_usd), 0)
+      : 0;
+
+    // TRUE Idle Cash logic: Current USDC - Upcoming Obligations
+    const idleUsdc = Math.max(usdcBalance - upcomingObligations, 0);
 
     const shouldSweep = idleUsdc > IDLE_THRESHOLD_USD;
     const sweepAmount = shouldSweep ? Number((idleUsdc * SWEEP_PERCENTAGE).toFixed(2)) : 0;
@@ -118,19 +133,19 @@ export async function getTreasuryAdvice(
       recommendations.push({
         action: 'SWEEP_TO_USYC',
         amount: sweepAmount,
-        description: `Sweep $${sweepAmount.toLocaleString()} into USYC T-Bill vault`,
-        expectedReturn: `~$${monthlyYield.toFixed(2)}/mo at ${(CURRENT_TBILL_APY * 100).toFixed(1)}% APY`,
+        description: `Convert $${sweepAmount.toLocaleString()} to USYC T-Bill token.`,
+        expectedReturn: `+$${monthlyYield.toFixed(2)} passive income over 30 days`,
         urgency: 'HIGH',
       });
     }
 
     // Check if EUR settlements might be needed
-    if (eurcBalance < 10_000 && usdcBalance > 30_000) {
-      const fxAmount = Math.min(15_000, usdcBalance * 0.1);
+    if (eurcBalance < 20_000 && usdcBalance > 50_000) {
+      const fxAmount = Math.min(25_000, usdcBalance * 0.2);
       recommendations.push({
         action: 'FX_CONVERSION',
         amount: fxAmount,
-        description: `Convert $${fxAmount.toLocaleString()} USDC → EURC for EU operations`,
+        description: `Convert $${fxAmount.toLocaleString()} USDC → EURC for upcoming EU vendor obligations`,
         expectedReturn: `~€${(fxAmount * EUR_USD_RATE).toLocaleString()} EURC`,
         urgency: 'MEDIUM',
       });
@@ -140,7 +155,7 @@ export async function getTreasuryAdvice(
       recommendations.push({
         action: 'HOLD',
         amount: idleUsdc,
-        description: 'Current USDC position is within optimal range',
+        description: `Current USDC position ($${usdcBalance.toLocaleString()}) minus 5-day obligations ($${upcomingObligations.toLocaleString()}) leaves $${idleUsdc.toLocaleString()} idle. Below $${IDLE_THRESHOLD_USD.toLocaleString()} sweep threshold.`,
         expectedReturn: 'No action needed',
         urgency: 'LOW',
       });

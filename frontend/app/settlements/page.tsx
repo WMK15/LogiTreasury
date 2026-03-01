@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { ConnectWallet } from "@/components/ui/ConnectWallet";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,65 +13,10 @@ import {
 } from "@/hooks/useContracts";
 import { EscrowCard } from "@/components/escrow/EscrowCard";
 
-// ============ Mock Settlement History ============
-
-const MOCK_SETTLEMENTS = [
-  {
-    id: "stl-1",
-    type: "FX Settlement",
-    from: "USDC",
-    to: "EURC",
-    amount: 25,
-    rate: "0.9200",
-    status: "Completed",
-    date: new Date(Date.now() - 2 * 3600 * 1000).toLocaleDateString("en-GB"),
-    txHash: "0x1a2b3c...7890",
-  },
-  {
-    id: "stl-2",
-    type: "Escrow Release",
-    from: "Escrow #3",
-    to: "Carrier",
-    amount: 12.5,
-    rate: "—",
-    status: "Completed",
-    date: new Date(Date.now() - 24 * 3600 * 1000).toLocaleDateString("en-GB"),
-    txHash: "0x2b3c4d...90ab",
-  },
-  {
-    id: "stl-3",
-    type: "Cross-chain",
-    from: "Arc",
-    to: "Ethereum",
-    amount: 50,
-    rate: "—",
-    status: "Pending",
-    date: new Date(Date.now() - 1 * 3600 * 1000).toLocaleDateString("en-GB"),
-    txHash: "0x3c4d5e...abcd",
-  },
-  {
-    id: "stl-4",
-    type: "FX Settlement",
-    from: "EURC",
-    to: "USDC",
-    amount: 10,
-    rate: "1.0870",
-    status: "Completed",
-    date: new Date(Date.now() - 72 * 3600 * 1000).toLocaleDateString("en-GB"),
-    txHash: "0x4d5e6f...cde1",
-  },
-  {
-    id: "stl-5",
-    type: "Escrow Release",
-    from: "Escrow #1",
-    to: "Carrier",
-    amount: 8.5,
-    rate: "—",
-    status: "Completed",
-    date: new Date(Date.now() - 96 * 3600 * 1000).toLocaleDateString("en-GB"),
-    txHash: "0x5e6f78...ef12",
-  },
-];
+import {
+  getSettlementHistory,
+  type SettlementRecord,
+} from "@/app/actions/getSettlementHistory";
 
 // ============ Types ============
 
@@ -82,10 +27,19 @@ type Tab = "obligations" | "locked" | "history" | "create";
 export default function SettlementsPage() {
   const { address, isConnected } = useAccount();
   const [activeTab, setActiveTab] = useState<Tab>("obligations");
+  const [historyItems, setHistoryItems] = useState<SettlementRecord[]>([]);
 
   const { data: usdcBalance, isLoading: balanceLoading } =
     useUSDCBalance(address);
   const { data: escrowCount, isLoading: countLoading } = useEscrowCount();
+
+  useEffect(() => {
+    // We assume company id is bound internally in real app via auth context
+    // Hardcoding test company for demo
+    getSettlementHistory("073e895c-5182-4467-93f8-dc12863ce9b1").then(
+      setHistoryItems,
+    );
+  }, []);
 
   // Shipper/Carrier escrows — no longer available via legacy FreightEscrow
   const shipperEscrows: readonly bigint[] = [];
@@ -104,6 +58,10 @@ export default function SettlementsPage() {
       </div>
     );
   }
+
+  const pendingSettlementsCount = historyItems.filter(
+    (s) => s.status === "Pending",
+  ).length;
 
   return (
     <div>
@@ -149,9 +107,7 @@ export default function SettlementsPage() {
         </div>
         <div className="card">
           <p className="kpi-label mb-1">Pending Settlements</p>
-          <p className="kpi-value text-amber-400">
-            {MOCK_SETTLEMENTS.filter((s) => s.status === "Pending").length}
-          </p>
+          <p className="kpi-value text-amber-400">{pendingSettlementsCount}</p>
         </div>
       </div>
 
@@ -179,6 +135,7 @@ export default function SettlementsPage() {
       {/* Tab Content */}
       {activeTab === "obligations" && (
         <PaymentObligations
+          items={historyItems}
           shipperEscrows={shipperEscrows || []}
           carrierEscrows={carrierEscrows || []}
           shipperLoading={shipperLoading}
@@ -191,7 +148,7 @@ export default function SettlementsPage() {
           isLoading={shipperLoading}
         />
       )}
-      {activeTab === "history" && <ReleaseHistory />}
+      {activeTab === "history" && <ReleaseHistory items={historyItems} />}
       {activeTab === "create" && (
         <CreateEscrowForm onSuccess={() => setActiveTab("obligations")} />
       )}
@@ -202,36 +159,69 @@ export default function SettlementsPage() {
 // ============ Sub-Components ============
 
 function PaymentObligations({
+  items,
   shipperEscrows,
   carrierEscrows,
   shipperLoading,
   carrierLoading,
 }: {
+  items: typeof getSettlementHistory extends (
+    companyId: string,
+  ) => Promise<infer T>
+    ? T
+    : any[];
   shipperEscrows: readonly bigint[];
   carrierEscrows: readonly bigint[];
   shipperLoading: boolean;
   carrierLoading: boolean;
 }) {
+  const pendingObligations = items.filter((s) => s.status === "Pending");
+
   return (
     <div className="space-y-6">
-      {/* Outgoing Obligations (As Shipper) */}
+      {/* Upcoming / Pending Obligations */}
       <div>
         <p className="text-xs text-neutral-500 uppercase tracking-wider mb-3">
-          ↑ Outgoing — Funds you owe (as Shipper)
+          ↑ Upcoming Obligations (Next 5 Days)
         </p>
-        {shipperLoading ? (
-          <div className="space-y-3">
-            <EscrowCardSkeleton />
-            <EscrowCardSkeleton />
-          </div>
-        ) : shipperEscrows.length === 0 ? (
+
+        {pendingObligations.length === 0 ? (
           <div className="card">
-            <p className="text-sm text-neutral-500">No outgoing obligations</p>
+            <p className="text-sm text-neutral-500">No upcoming obligations</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {shipperEscrows.map((id) => (
-              <EscrowCard key={id.toString()} escrowId={id} role="shipper" />
+            {pendingObligations.map((tx) => (
+              <div
+                key={tx.id}
+                className="card bg-neutral-900/40 hover:bg-neutral-800/60 transition-colors border-l-2 border-l-amber-500"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center">
+                      <span className="text-amber-400 text-xs text-center font-bold">
+                        !
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-xs text-neutral-200 font-medium">
+                        Auto-Settlement pending for {tx.date}
+                      </p>
+                      <p className="text-[10px] text-neutral-500 mt-0.5">
+                        Automated {tx.type}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-medium text-amber-400 tabular-nums">
+                      -{tx.amount.toLocaleString()} {tx.from}
+                    </p>
+                    <p className="text-[10px] text-neutral-500 px-1.5 py-0.5 mt-1 rounded bg-amber-500/10 inline-block">
+                      PENDING
+                    </p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -305,7 +295,15 @@ function LockedFunds({
   );
 }
 
-function ReleaseHistory() {
+function ReleaseHistory({
+  items,
+}: {
+  items: typeof getSettlementHistory extends (
+    companyId: string,
+  ) => Promise<infer T>
+    ? T
+    : any;
+}) {
   return (
     <div className="card">
       <div className="flex items-center justify-between mb-4">
@@ -343,7 +341,7 @@ function ReleaseHistory() {
             </tr>
           </thead>
           <tbody>
-            {MOCK_SETTLEMENTS.map((s) => (
+            {items.map((s: any) => (
               <tr
                 key={s.id}
                 className="border-b border-neutral-800/50 hover:bg-neutral-800/30 transition-colors"

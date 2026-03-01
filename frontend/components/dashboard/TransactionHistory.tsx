@@ -3,56 +3,10 @@
 import { useState, useEffect } from "react";
 import { formatUSDC } from "@/lib/config";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { ActivityItem } from "@/types/treasury";
-
-// Simulated data to preview the UI until The Graph/indexers are hooked up
-const MOCK_ACTIVITIES: ActivityItem[] = [
-  {
-    id: "tx-1",
-    type: "deposit",
-    amount: 50000000000n, // $50,000
-    token: "USDC",
-    status: "completed",
-    timestamp: BigInt(Math.floor(Date.now() / 1000) - 3600 * 2),
-    description: "Fiat funding deposit via CPN",
-  },
-  {
-    id: "tx-2",
-    type: "yield",
-    amount: 1520000n, // $1.52
-    token: "USYC",
-    status: "completed",
-    timestamp: BigInt(Math.floor(Date.now() / 1000) - 3600 * 24),
-    description: "Daily automated yield rebalance",
-  },
-  {
-    id: "tx-3",
-    type: "escrow",
-    amount: 2500000000n, // $2,500
-    token: "USDC",
-    status: "completed",
-    timestamp: BigInt(Math.floor(Date.now() / 1000) - 3600 * 48),
-    description: "Smart contract freight escrow locked",
-  },
-  {
-    id: "tx-4",
-    type: "settlement",
-    amount: 800000000n, // $800
-    token: "EURC",
-    status: "completed",
-    timestamp: BigInt(Math.floor(Date.now() / 1000) - 3600 * 72),
-    description: "Cross border settlement to EURC",
-  },
-  {
-    id: "tx-5",
-    type: "withdrawal",
-    amount: 1500000000n, // $1,500
-    token: "USDC",
-    status: "completed",
-    timestamp: BigInt(Math.floor(Date.now() / 1000) - 3600 * 96),
-    description: "Fiat withdrawal to matched bank account",
-  },
-];
+import {
+  getSettlementHistory,
+  type SettlementRecord,
+} from "@/app/actions/getSettlementHistory";
 
 function TransactionSkeleton() {
   return (
@@ -73,16 +27,24 @@ function TransactionSkeleton() {
 }
 
 export function TransactionHistory() {
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [activities, setActivities] = useState<SettlementRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulate loading delay for demo purposes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setActivities(MOCK_ACTIVITIES);
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
+    // Hardcoding test company for demo
+    getSettlementHistory("11111111-1111-1111-1111-111111111111", [
+      "SETTLEMENT",
+      "FX_SWAP",
+      "TREASURY_SWEEP",
+    ])
+      .then((data) => {
+        setActivities(data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load txs", err);
+        setIsLoading(false);
+      });
   }, []);
 
   return (
@@ -120,34 +82,30 @@ export function TransactionHistory() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs
                   ${
-                    activity.type === "deposit"
-                      ? "bg-emerald-500/10 text-emerald-400"
-                      : activity.type === "withdrawal" ||
-                          activity.type === "escrow"
-                        ? "bg-amber-500/10 text-amber-400"
-                        : "bg-blue-500/10 text-blue-400"
+                    activity.type === "Cross-chain" ||
+                    activity.type === "Escrow Release"
+                      ? "bg-amber-500/10 text-amber-400"
+                      : "bg-blue-500/10 text-blue-400"
                   }`}
                 >
-                  {activity.type === "deposit" && "↓"}
-                  {activity.type === "withdrawal" && "↑"}
-                  {activity.type === "escrow" && "⚿"}
-                  {activity.type === "settlement" && "⇄"}
-                  {activity.type === "yield" && "✦"}
-                  {activity.type === "swap" && "⇌"}
+                  {activity.type === "FX Settlement" && "⇄"}
+                  {activity.type === "Cross-chain" && "⇌"}
+                  {activity.type === "Escrow Release" && "⚿"}
+                  {!["FX Settlement", "Cross-chain", "Escrow Release"].includes(
+                    activity.type,
+                  ) && "✦"}
                 </div>
 
                 <div>
                   <p className="text-sm font-medium text-neutral-200">
-                    {activity.description}
+                    {activity.type} ({activity.from} → {activity.to})
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs text-neutral-500">
-                      {new Date(
-                        Number(activity.timestamp) * 1000,
-                      ).toLocaleDateString()}
+                      {activity.date}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider text-neutral-600 bg-neutral-900 px-1.5 py-0.5 rounded">
-                      {activity.type}
+                      {activity.status}
                     </span>
                   </div>
                 </div>
@@ -156,15 +114,14 @@ export function TransactionHistory() {
               <div className="text-right">
                 <p
                   className={`text-sm font-semibold 
-                  ${activity.type === "deposit" || activity.type === "yield" ? "text-emerald-400" : "text-neutral-100"}`}
+                  ${activity.status === "Completed" ? "text-emerald-400" : "text-amber-400"}`}
                 >
-                  {activity.type === "deposit" || activity.type === "yield"
-                    ? "+"
-                    : "-"}
-                  ${formatUSDC(activity.amount)}
+                  ${activity.amount.toLocaleString()}
                 </p>
                 <p className="text-xs font-mono text-neutral-500 mt-1">
-                  {activity.token}
+                  {["FX Settlement", "Yield Sweep"].includes(activity.type)
+                    ? activity.to
+                    : activity.from}
                 </p>
               </div>
             </div>

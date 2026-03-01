@@ -5,6 +5,12 @@
  * Usage: npx tsx lib/seed.ts (or import and call seedDemoData())
  */
 
+import * as dotenv from 'dotenv';
+import { resolve } from 'path';
+
+// Load environment variables from .env.local
+dotenv.config({ path: resolve(process.cwd(), '.env.local') });
+
 import { supabase, isSupabaseConfigured } from './supabase';
 
 const DEMO_COMPANY = {
@@ -56,6 +62,7 @@ export async function seedDemoData() {
 
   // 3. Create transactions and audit trail entries
   const transactions = [
+    // Past completed transactions (history)
     {
       company_id: companyId,
       type: 'FX_SWAP' as const,
@@ -91,17 +98,6 @@ export async function seedDemoData() {
     },
     {
       company_id: companyId,
-      type: 'FX_SWAP' as const,
-      from_currency: 'EURC',
-      to_currency: 'USDC',
-      amount: 10_000.00,
-      fiat_value_usd: 10_869.57,
-      tx_hash: '0x4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcde1',
-      status: 'COMPLETED' as const,
-      created_at: new Date(Date.now() - 72 * 3600 * 1000).toISOString(),
-    },
-    {
-      company_id: companyId,
       type: 'TREASURY_SWEEP' as const,
       from_currency: 'USDC',
       to_currency: 'USYC',
@@ -111,27 +107,28 @@ export async function seedDemoData() {
       status: 'COMPLETED' as const,
       created_at: new Date(Date.now() - 96 * 3600 * 1000).toISOString(),
     },
+    // Future pending obligations (upcoming liabilities within 5 days)
     {
       company_id: companyId,
-      type: 'FX_SWAP' as const,
+      type: 'SETTLEMENT' as const,
       from_currency: 'USDC',
-      to_currency: 'EURC',
-      amount: 8_500.00,
-      fiat_value_usd: 8_500.00,
-      tx_hash: '0x6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234',
-      status: 'COMPLETED' as const,
-      created_at: new Date(Date.now() - 120 * 3600 * 1000).toISOString(),
+      to_currency: 'USD',
+      amount: 40_000.00,
+      fiat_value_usd: 40_000.00,
+      tx_hash: null, // No hash yet since it's pending
+      status: 'PENDING' as const,
+      created_at: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString(), // Due in 2 days
     },
     {
       company_id: companyId,
       type: 'SETTLEMENT' as const,
       from_currency: 'USDC',
-      to_currency: 'USDC',
-      amount: 72_000.00,
-      fiat_value_usd: 72_000.00,
-      tx_hash: '0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456',
+      to_currency: 'EUR', // Simulating an upcoming EU vendor payment 
+      amount: 25_000.00, 
+      fiat_value_usd: 26_250.00,
+      tx_hash: null,
       status: 'PENDING' as const,
-      created_at: new Date(Date.now() - 1 * 3600 * 1000).toISOString(),
+      created_at: new Date(Date.now() + 4 * 24 * 3600 * 1000).toISOString(), // Due in 4 days
     },
   ];
 
@@ -150,19 +147,42 @@ export async function seedDemoData() {
   const auditEntries = txData
     .filter(tx => tx.status === 'COMPLETED')
     .map(tx => {
-      const taxRate = tx.type === 'FX_SWAP' ? 0.005 : tx.type === 'TREASURY_SWEEP' ? 0.20 : 0.001;
-      const yieldGain = tx.type === 'TREASURY_SWEEP' ? tx.amount * 0.048 / 12 : tx.amount;
-      const taxBasis = tx.type === 'TREASURY_SWEEP' ? yieldGain : tx.amount;
+      let taxRate = 0;
+      let taxBasis = 0;
+      let actionType = '';
+      let reasoning = '';
+      let complianceStatus: 'COMPLIANT' | 'REVIEW_REQUIRED' | 'FLAGGED' | 'EXEMPT' = 'COMPLIANT';
+
+      if (tx.type === 'FX_SWAP') {
+        taxRate = 0.005; // 0.5% levy
+        taxBasis = tx.fiat_value_usd;
+        actionType = 'Cross-border Levy';
+        reasoning = 'Automated tax calculation for FX swap. EU MiCA cross-border transfer levy applied natively at settlement.';
+      } else if (tx.type === 'TREASURY_SWEEP') {
+        // For USYC conversions, withholding tax is on the ~4.8% APY assumed gain
+        taxRate = 0.20; // 20% withholding
+        taxBasis = tx.fiat_value_usd * 0.048; // Annual estimated basis
+        actionType = 'USYC Withholding Tax';
+        reasoning = `USDC to USYC sweep of $${tx.amount.toLocaleString()}. 20% future withholding tax applied on expected Treasury Bill yield over duration.`;
+      } else {
+        taxRate = 0.001; // 0.1% fee
+        taxBasis = tx.fiat_value_usd;
+        actionType = 'Settlement Fee';
+        reasoning = 'Automated bridge settlement fee applied.';
+      }
+
+      if (tx.amount >= 100_000) complianceStatus = 'REVIEW_REQUIRED';
+
       const taxWithheld = taxBasis * taxRate;
 
       return {
         tx_id: tx.id,
-        action_type: tx.type === 'FX_SWAP' ? 'Cross-border Levy' : tx.type === 'TREASURY_SWEEP' ? 'Yield Withholding' : 'Settlement Fee',
+        action_type: actionType,
         tax_basis_usd: Number(taxBasis.toFixed(6)),
         tax_rate_applied: taxRate,
         total_tax_withheld: Number(taxWithheld.toFixed(6)),
-        ai_reasoning_summary: `Automated tax calculation for ${tx.type.replace('_', ' ')} of $${tx.amount.toLocaleString()}. ${tx.type === 'FX_SWAP' ? 'EU MiCA levy applied.' : tx.type === 'TREASURY_SWEEP' ? 'T-Bill yield withholding applied.' : 'Bridge settlement fee applied.'}`,
-        compliance_status: tx.amount >= 100_000 ? 'REVIEW_REQUIRED' as const : 'COMPLIANT' as const,
+        ai_reasoning_summary: reasoning,
+        compliance_status: complianceStatus,
       };
     });
 
@@ -178,3 +198,6 @@ export async function seedDemoData() {
   console.log('🎉 Demo data seeded successfully!');
   console.log(`📋 Company ID: ${companyId}`);
 }
+
+// Ensure the function gets called when run directly via CLI
+seedDemoData().catch(console.error);

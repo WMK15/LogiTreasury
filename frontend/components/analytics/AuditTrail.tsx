@@ -353,7 +353,7 @@ export function AuditTrail() {
                 <>
                   <tr
                     key={entry.id}
-                    className="border-b border-neutral-800/50 hover:bg-neutral-800/30 cursor-pointer transition-colors"
+                    className={`border-b border-neutral-800/50 hover:bg-neutral-800/30 cursor-pointer transition-colors ${entry.transaction.to_currency === "USYC" ? "bg-emerald-950/10" : ""}`}
                     onClick={() =>
                       setExpandedRow(expandedRow === entry.id ? null : entry.id)
                     }
@@ -366,13 +366,25 @@ export function AuditTrail() {
                     </td>
                     <td className="py-2.5 px-2 text-neutral-400">
                       {entry.transaction.from_currency} →{" "}
-                      {entry.transaction.to_currency}
+                      {entry.transaction.to_currency === "USYC" ? (
+                        <span className="text-emerald-400 font-medium">
+                          USYC
+                        </span>
+                      ) : (
+                        entry.transaction.to_currency
+                      )}
                     </td>
                     <td className="py-2.5 px-2 text-right text-neutral-200 font-mono">
                       ${entry.transaction.fiat_value_usd.toLocaleString()}
                     </td>
-                    <td className="py-2.5 px-2 text-right text-neutral-400 font-mono">
+                    <td
+                      className="py-2.5 px-2 text-right text-neutral-400 font-mono"
+                      title={`Basis: $${entry.tax_basis_usd.toLocaleString()}`}
+                    >
                       {(entry.tax_rate_applied * 100).toFixed(1)}%
+                      <span className="block text-[8px] text-neutral-600 mt-0.5">
+                        Basis: ${entry.tax_basis_usd.toLocaleString()}
+                      </span>
                     </td>
                     <td className="py-2.5 px-2 text-right text-amber-400 font-mono font-medium">
                       ${entry.total_tax_withheld.toFixed(2)}

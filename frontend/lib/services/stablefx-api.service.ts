@@ -61,20 +61,20 @@ export interface StableFXExecution {
 const STABLEFX_API_URL = process.env.STABLEFX_API_URL || 'https://api.circle.com/v1/stablefx';
 const STABLEFX_API_KEY = process.env.STABLEFX_API_KEY || '';
 
-// Demo mode - use mock rates when API key is test key or missing
-const isDemoMode = !STABLEFX_API_KEY || STABLEFX_API_KEY.startsWith('TEST_API_KEY');
+// Demo mode - use mock rates when API key is missing entirely
+const isDemoMode = !STABLEFX_API_KEY;
 
 // Mock rates for demo mode (realistic EUR/USD rates)
 const MOCK_RATES: StableFXRates = {
   USDC_EURC: {
-    rate: '0.9215',
-    inverseRate: '1.0852',
+    rate: '0.9520',
+    inverseRate: '1.0504',
     spread: '0.0015',
     timestamp: new Date().toISOString(),
   },
   EURC_USDC: {
-    rate: '1.0852',
-    inverseRate: '0.9215',
+    rate: '1.0504',
+    inverseRate: '0.9520',
     spread: '0.0015',
     timestamp: new Date().toISOString(),
   },
@@ -104,9 +104,22 @@ export class StableFXAPIService {
    */
   async getRates(): Promise<StableFXRates> {
     if (isDemoMode) {
-      // Add slight randomness to mock rates for realism
+      let baseRate = 0.9520; // fallback
+      try {
+        // Fetch actual live EUR to USD rate
+        const res = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD');
+        const data = await res.json();
+        // Since we want USDC to EURC as the base (USD to EUR), we invert the EUR to USD rate
+        if (data && data.rates && data.rates.USD) {
+          baseRate = 1 / data.rates.USD; 
+        }
+      } catch (e) {
+        console.warn('Failed to fetch live FX rate, using fallback', e);
+      }
+
+      // Add slight randomness to rates for realism
       const variance = (Math.random() - 0.5) * 0.002; // ±0.1% variance
-      const baseRate = 0.9215 + variance;
+      baseRate += variance;
       
       return {
         USDC_EURC: {

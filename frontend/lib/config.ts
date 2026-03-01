@@ -95,19 +95,21 @@ export const CONTRACTS = isLocal ? {
 /**
  * Wagmi Configuration
  */
-export const config = createConfig({
-  chains: [activeChain],
-  connectors: [
-    injected(),
-    walletConnect({
-      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "demo",
-    }),
-  ],
-  transports: {
-    [activeChain.id]: http(),
-  } as Record<number, ReturnType<typeof http>>,
-  ssr: true,
-});
+export function getConfig() {
+  return createConfig({
+    chains: [activeChain],
+    connectors: [
+      injected(),
+      walletConnect({
+        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "demo",
+      }),
+    ],
+    transports: {
+      [activeChain.id]: http(),
+    } as Record<number, ReturnType<typeof http>>,
+    ssr: true,
+  });
+}
 
 /**
  * Token decimals
