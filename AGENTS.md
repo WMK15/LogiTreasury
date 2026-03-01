@@ -2,6 +2,8 @@
 
 > Instructions for AI agents (Claude, GPT, Copilot, etc.) working on this codebase.
 
+**CRITICAL DIRECTIVE**: If you are an AI assistant starting a new session or reading this file for the first time, you MUST read the entirety of `AGENTS.md`, `CURRENT.md`, and `CHANGELOG.md` before making a single code alteration.
+
 ---
 
 ## Project Context

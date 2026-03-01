@@ -59,6 +59,22 @@ All notable changes to the ArcLogistics Treasury project are documented here.
 
 ---
 
+## [0.6.0] - 2026-03-01 — Supabase & Flattening
+
+### Added
+
+- **getBankBalances Server Action** - Connects Dashboard's `Bank Liquid (CPN)` KPI directly to fiat reserves in Supabase.
+- **insert_yield_swap.sql** - Added specific SQL migration to natively simulate the `5 USDC to 4.48 USYC` yield sweep logic.
+
+### Changed
+
+- **Frontend Flattening** - Entire `frontend/` directory was flattened into the root of the repository for simpler deployment and VS Code integrations.
+- **Dashboard TransactionHistory** - Fully wired to Supabase `transactions` via `getSettlementHistory`, intelligently replacing mock data and auto-parsing correct origin/destination asset tickers.
+- **AuditTrail Component** - Fully wired to Supabase `audit_trail`, now dynamically surfacing institutional withholding taxes and USYC calculations.
+- **Settlements Page** - `ReleaseHistory` and `PaymentObligations` components are now iterating exclusively on live Supabase transactions querying `PENDING` statuses.
+
+---
+
 ## [0.4.3] - 2026-02-28
 
 ### Added

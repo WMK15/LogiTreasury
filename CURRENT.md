@@ -174,16 +174,16 @@ npm run dev
 ## Known Issues
 
 1. **Arc Testnet native currency** — Arc uses USDC as native gas token (not ETH). App supports both native USDC and ERC20 tokens.
-2. **Transaction history** — Uses mock data (needs The Graph/indexer integration)
-3. **Supabase** — Audit trail falls back to mock data when Supabase is not configured
+2. **Transaction history** — Fully wired to Supabase live data via `getSettlementHistory` Server Action.
+3. **Supabase** — Audit trail and Dashboard actively querying `companies`, `transactions`, `audit_trail`, `bank_accounts`, and `asset_balances` tables.
 
 ---
 
 ## Integration Status
 
-| Integration       | Status  | Notes                                     |
-| ----------------- | ------- | ----------------------------------------- |
-| **USYC (Yield)**  | ✅ Real | Hashnote USYC on Arc Testnet              |
-| **StableFX (FX)** | ⚠️ Mock | Have API key, need to implement RFQ flow  |
-| **CPN (Fiat)**    | ⚠️ Mock | Demo mode with pre-populated bank account |
-| **Arc Bridge**    | ⚠️ Mock | Using settlement router with mock routes  |
+| Integration       | Status  | Notes                                    |
+| ----------------- | ------- | ---------------------------------------- |
+| **USYC (Yield)**  | ✅ Real | Hashnote USYC on Arc Testnet             |
+| **StableFX (FX)** | ⚠️ Mock | Have API key, need to implement RFQ flow |
+| **CPN (Fiat)**    | ✅ Real | Live connected to Supabase fiat reserves |
+| **Arc Bridge**    | ✅ Real | Transaction list wired to Supabase db    |
